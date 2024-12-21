@@ -1,5 +1,7 @@
 package controller;
 
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import model.User;
 import org.passay.*;
 
@@ -8,7 +10,10 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.api.core.ApiFuture;
 
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
@@ -23,7 +28,7 @@ public class RegisterController {
 
     public void registerUser() {
         User user = new User(recieveName(), recievePassword());
-        System.out.println("Registro exitoso");
+        System.err.println("Registro exitoso");
         saveUserToFirestore(user); // Guarda el usuario en Firestore
     }
 
@@ -32,7 +37,7 @@ public class RegisterController {
             System.out.println("Por favor digite un nombre de usuario");
             String name = scanner.nextLine();
             if (existsUserByName(name)) {
-                System.err.println("El usuario ya existe");
+                System.err.println("Este nombre de usuario ya existe");
             } else if (isEmpty(name)) {
                 System.err.println("El nombre de usuario es obligatorio");
             } else {
@@ -46,7 +51,7 @@ public class RegisterController {
             System.out.println("Por favor digite una contraseña");
             String password = scanner.nextLine();
             if (!validatePassword(password)) {
-                System.err.println("Por favor digite una contraseña valida");
+                System.err.println("Por favor digite una contraseña valida (8-30 caracteres/Al menos una mayuscula/Al menos un digito/Al menos un simbolo)");
             } else {
                 return password;
             }
@@ -82,16 +87,18 @@ public class RegisterController {
     }
 
     private void saveUserToFirestore(User user) {
-        // Guarda el documento del usuario en la colección "users" en Firestore
+        // Accede a la coleccion "users" si no existe la crea . Dentro de ella se crea un usuario cuyo id es el nombre y se anexa su info
         ApiFuture<WriteResult> future = db.collection("users").document(user.getUserName()).set(user);
         try {
             // Obtiene el resultado de la operación de escritura
             WriteResult result = future.get();
-            System.out.println("Usuario guardado exitosamente en Firestore en: " + result.getUpdateTime());
+            System.err.println("Usuario guardado exitosamente en Firestore en: " + result.getUpdateTime());
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al guardar el usuario en Firestore: " + e);
         }
     }
+
+
 
     public void closeScanner() {
         scanner.close();
