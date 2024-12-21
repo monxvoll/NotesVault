@@ -1,6 +1,8 @@
 package model;
 
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -9,10 +11,10 @@ public class User {
     private String password;
     private List<Task> taskList;
 
-    public User(String userName, String password, List<Task> taskList) {
+    public User(String userName, String password) {
         this.userName = userName;
         this.password = hashPassword(password);
-        this.taskList = taskList;
+        taskList = new ArrayList<>();
     }
 
     public String getUserName() {
@@ -39,12 +41,7 @@ public class User {
         this.taskList = taskList;
     }
 
-
-    public boolean validatePassword(String password) {
-        return BCrypt.checkpw(password, this.password);
-    }
-
     private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt()); //retorna la contraseña hasheada como string
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }
