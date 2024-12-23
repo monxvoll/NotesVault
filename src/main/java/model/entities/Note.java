@@ -1,6 +1,4 @@
-package model;
-
-import java.util.Date;
+package model.entities;
 
 public class Note {
 
