@@ -1,4 +1,4 @@
-package model;
+package model.entities;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -9,12 +9,12 @@ public class User {
 
     private String userName;
     private String password;
-    private List<Note> taskList;
+    private List<Note> noteList;
 
     public User(String userName, String password) {
         this.userName = userName;
         this.password = hashPassword(password);
-        taskList = new ArrayList<>();
+        noteList = new ArrayList<>();
     }
 
     public String getUserName() {
@@ -33,12 +33,12 @@ public class User {
         this.password = hashPassword(password);
     }
 
-    public List<Note> getTaskList() {
-        return taskList;
+    public List<Note> getNoteList() {
+        return noteList;
     }
 
-    public void setTaskList(List<Note> taskList) {
-        this.taskList = taskList;
+    public void setNoteList(List<Note> noteList) {
+        this.noteList = noteList;
     }
 
     private String hashPassword(String password) {
