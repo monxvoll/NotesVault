@@ -1,7 +1,8 @@
 package view;
 
-import controller.LoginController;
-import controller.RegisterController;
+import controller.auth.LoginController;
+import controller.auth.RegisterController;
+import model.entities.User;
 
 import java.util.Scanner;
 
@@ -19,10 +20,13 @@ public class Main {
         String opt = scanner.nextLine();
             switch (opt) {
                 case "1":
-                    loginController.login();
+                    if(loginController.login()){
+                        showNotesMenu(loginController.getActualUser());
+                        System.exit(0);
+                    }
                     break;
                 case "2":
-                    registerController.registerUser();
+                    registerController.register();
                     break;
                 default:
                     System.err.println("Digite una opcion valida");
@@ -30,5 +34,14 @@ public class Main {
         }
 
 
+    }
+
+    public static void showNotesMenu(User user){
+       //En construccion
+        executeOption(0,user);
+    }
+
+    private static void executeOption(int opt,User user){
+        //En construccion
     }
 }
