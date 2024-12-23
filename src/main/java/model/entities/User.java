@@ -9,7 +9,7 @@ public class User {
 
     private String userName;
     private String password;
-    private List<Task> taskList;
+    private List<Note> taskList;
 
     public User(String userName, String password) {
         this.userName = userName;
@@ -33,11 +33,11 @@ public class User {
         this.password = hashPassword(password);
     }
 
-    public List<Task> getTaskList() {
+    public List<Note> getTaskList() {
         return taskList;
     }
 
-    public void setTaskList(List<Task> taskList) {
+    public void setTaskList(List<Note> taskList) {
         this.taskList = taskList;
     }
 
