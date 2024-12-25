@@ -9,15 +9,17 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.google.api.core.ApiFuture;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class Register {
     private Scanner scanner;
-    private Firestore db;
+    private Firestore firestore;
 
     public Register() {
-        this.db = FirestoreClient.getFirestore(); // Inicializa Firestore
+        this.firestore = FirestoreClient.getFirestore(); // Inicializa Firestore
         this.scanner = new Scanner(System.in);
     }
 
@@ -69,7 +71,7 @@ public class Register {
     private boolean existsUserByName(String name) {
         System.out.println("Verificando .....");
         try {
-            ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = db.collection("users").document(name).get();
+            ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = firestore.collection("users").document(name).get();
             com.google.cloud.firestore.DocumentSnapshot document = future.get();
             return document.exists();
         } catch (InterruptedException | ExecutionException e) {
@@ -83,8 +85,12 @@ public class Register {
     }
 
     private void saveUserToFirestore(User user) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("userName",user.getUserName());
+        userMap.put("password",user.getPassword());
+
         // Accede a la coleccion "users" si no existe la crea . Dentro de ella se crea un usuario cuyo id es el nombre y se anexa su info
-        ApiFuture<WriteResult> future = db.collection("users").document(user.getUserName()).set(user);
+        ApiFuture<WriteResult> future = firestore.collection("users").document(user.getUserName()).set(userMap);
         try {
             // Obtiene el resultado de la operación de escritura
             WriteResult result = future.get();
