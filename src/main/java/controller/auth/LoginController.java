@@ -1,7 +1,5 @@
 package controller.auth;
 
-
-import jdk.nashorn.internal.runtime.regexp.joni.ast.StringNode;
 import model.authlogic.Login;
 import model.entities.User;
 
