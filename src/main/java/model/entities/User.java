@@ -9,12 +9,12 @@ public class User {
 
     private String userName;
     private String password;
-    private List<Note> noteList;
+    private List<Note> notesList;
 
     public User(String userName, String password) {
         this.userName = userName;
         this.password = hashPassword(password);
-        noteList = new ArrayList<>();
+        notesList = new ArrayList<>();
     }
 
     public String getUserName() {
@@ -33,12 +33,12 @@ public class User {
         this.password = hashPassword(password);
     }
 
-    public List<Note> getNoteList() {
-        return noteList;
+    public List<Note> getNotesList() {
+        return notesList;
     }
 
-    public void setNoteList(List<Note> noteList) {
-        this.noteList = noteList;
+    public void setNotesList(List<Note> noteList) {
+        this.notesList = noteList;
     }
 
     private String hashPassword(String password) {
