@@ -14,12 +14,12 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class Login {
-    private Firestore db;
+    private Firestore firestore;
     private Scanner scanner ;
     private User actualUser;
 
     public Login (){
-        this.db = FirestoreClient.getFirestore(); // Inicializa Firestore
+        this.firestore = FirestoreClient.getFirestore(); // Inicializa Firestore
         this.scanner = new Scanner(System.in);
     }
 
@@ -44,7 +44,7 @@ public class Login {
     }
 
     private boolean compareInfo(String name , String password){
-        ApiFuture<QuerySnapshot> future = db.collection("users").get();
+        ApiFuture<QuerySnapshot> future = firestore.collection("users").get();
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             for (QueryDocumentSnapshot document : documents){
