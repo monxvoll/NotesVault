@@ -47,4 +47,14 @@ public class Note {
     public void setId(String id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "title='" + title + '\'' +
+                ", date='" + date + '\'' +
+                ", content='" + content + '\'' +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }
