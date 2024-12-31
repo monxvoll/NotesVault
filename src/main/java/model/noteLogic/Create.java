@@ -14,19 +14,18 @@ import java.util.Scanner;
 
 
 public class Create {
-        private Scanner scanner;
+
         private LocalDateTime localDateTime;
         private String exclusiveId;
         private Firestore firestore;
 
         public Create(){
-            this.scanner = new Scanner(System.in);
             this.localDateTime = LocalDateTime.now();
             this.exclusiveId = UUID.randomUUID().toString();
             this.firestore = FirestoreClient.getFirestore();
         }
 
-        public void createNote(User user){
+        public void createNote(User user,Scanner scanner){
             System.out.println("Digite el titulo de la nota");
             String title = scanner.nextLine();
             System.out.println("Digite el contenido de la nota");

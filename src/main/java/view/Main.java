@@ -16,6 +16,7 @@ public class Main {
    private static boolean flag = true;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
         // Inicializar Firebase
         FirebaseInitializer.initialize();
         RegisterController registerController = new RegisterController();
@@ -51,15 +52,15 @@ public class Main {
             System.out.println("4. Eliminar una nota");
             System.out.println("5. Cerrar Sesion");
             String opt = scanner.nextLine();
-            executeOption(opt, user);
+            executeOption(opt, user,scanner);
         }
     }
 
-    private static void executeOption(String opt,User user){
+    private static void executeOption(String opt,User user,Scanner scanner){
         switch (opt){
             case "1":
                 createController = new CreateController();
-                createController.createNote(user);
+                createController.createNote(user,scanner);
                 break;
             case "2":
                 readController = new ReadController();
@@ -77,10 +78,10 @@ public class Main {
         }
     }
 
-    public static void setFlagTrue(){
+    private static void setFlagTrue(){
         flag = true;
     }
-    public static void setFlagFalse(){
+    private static void setFlagFalse(){
         flag = false;
     }
 }
