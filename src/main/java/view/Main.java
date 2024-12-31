@@ -3,6 +3,7 @@ package view;
 import controller.auth.LoginController;
 import controller.auth.RegisterController;
 import controller.note.CreateController;
+import controller.note.ReadController;
 import model.entities.User;
 import java.util.Scanner;
 
@@ -10,6 +11,8 @@ import java.util.Scanner;
 public class Main {
 
    private static CreateController createController ;
+   private static ReadController readController;
+
    private static boolean flag = true;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -59,6 +62,8 @@ public class Main {
                 createController.createNote(user);
                 break;
             case "2":
+                readController = new ReadController();
+                readController.readNotes(user);
                 break;
             case "3":
                 break;
