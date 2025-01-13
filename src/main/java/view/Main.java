@@ -3,6 +3,7 @@ package view;
 import controller.auth.LoginController;
 import controller.auth.RegisterController;
 import controller.note.CreateController;
+import controller.note.DeleteController;
 import controller.note.ReadController;
 import model.entities.User;
 import java.util.Scanner;
@@ -12,6 +13,7 @@ public class Main {
 
    private static CreateController createController ;
    private static ReadController readController;
+   private static DeleteController deleteController;
 
    private static boolean flag = true;
     public static void main(String[] args) {
@@ -69,6 +71,8 @@ public class Main {
             case "3":
                 break;
             case "4":
+                deleteController = new DeleteController();
+                deleteController.deleteNote(user,scanner);
                 break;
             case "5":
                 setFlagTrue();
