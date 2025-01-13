@@ -1,6 +1,5 @@
 package model.entities;
 
-import java.util.UUID;
 
 public class Note {
 
@@ -8,6 +7,15 @@ public class Note {
     private String date;
     private String content;
     private String id;
+
+
+    /*Constructor vacío para firestore porque, al deserializar un documento (convertirlo en un objeto Java)
+    , crea una instancia vacía de la clase y luego llena sus atributos con los datos del documento.
+     */
+    
+    public Note(){
+
+    }
 
     public Note(String title, String content, String date, String id) {
         this.title = title;
