@@ -12,7 +12,6 @@ public class Note {
     /*Constructor vacío para firestore porque, al deserializar un documento (convertirlo en un objeto Java)
     , crea una instancia vacía de la clase y luego llena sus atributos con los datos del documento.
      */
-    
     public Note(){
 
     }
