@@ -5,6 +5,7 @@ import controller.auth.RegisterController;
 import controller.note.CreateController;
 import controller.note.DeleteController;
 import controller.note.ReadController;
+import controller.note.UpdateControlller;
 import model.entities.User;
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class Main {
    private static CreateController createController ;
    private static ReadController readController;
    private static DeleteController deleteController;
-
+   private static UpdateControlller updateControlller;
    private static boolean flag = true;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -23,7 +24,6 @@ public class Main {
         FirebaseInitializer.initialize();
         RegisterController registerController = new RegisterController();
         LoginController loginController = new LoginController();
-
 
 
         while (flag) {
@@ -69,6 +69,8 @@ public class Main {
                 readController.readNotes(user);
                 break;
             case "3":
+                updateControlller = new UpdateControlller();
+                updateControlller.updateNote(user,scanner);
                 break;
             case "4":
                 deleteController = new DeleteController();
