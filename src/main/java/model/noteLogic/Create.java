@@ -18,10 +18,10 @@ public class Create {
     private String exclusiveId;
     private Firestore firestore;
 
-    public Create(){
+    public Create(Firestore firestore){
         this.localDateTime = LocalDateTime.now();
         this.exclusiveId = UUID.randomUUID().toString(); //Genera un ID unico utilizando UUID y lo convierte a String
-        this.firestore = FirestoreClient.getFirestore();
+        this.firestore = firestore;
     }
 
     public void createNote(User user,Scanner scanner){
