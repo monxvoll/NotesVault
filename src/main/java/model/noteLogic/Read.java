@@ -4,7 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import model.entities.Note;
 import model.entities.User;
-import model.util.FirestoreInitializer;
+import util.FirestoreInitializer;
 
 import java.util.List;
 import java.util.Scanner;
