@@ -18,9 +18,9 @@ public class Login {
     private Scanner scanner ;
     private User actualUser;
 
-    public Login (){
-        this.firestore = FirestoreClient.getFirestore(); // Inicializa Firestore
-        this.scanner = new Scanner(System.in);
+    public Login (Scanner scanner,Firestore firestore){
+        this.scanner = scanner;
+        this.firestore = firestore;
     }
 
     public boolean loginUser(){
