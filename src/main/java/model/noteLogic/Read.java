@@ -2,20 +2,15 @@ package model.noteLogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import com.google.firebase.cloud.FirestoreClient;
 import model.entities.Note;
 import model.entities.User;
+import model.util.FirestoreInitializer;
 
 import java.util.List;
 import java.util.Scanner;
 
 
 public class Read {
-    private static Firestore firestore;
-
-    static {
-        firestore = FirestoreClient.getFirestore();
-    }
 
     public void readNotes(User user) {
         try {
@@ -43,18 +38,18 @@ public class Read {
         }
     }
 
-   public static boolean hasNotes(List<QueryDocumentSnapshot> documents){
-        if(documents.isEmpty()){
-            System.err.println("Usted actualmente no tiene notas");
-            return false;
-        }
-        return true;
-    }
+   public static boolean hasNotes(List<QueryDocumentSnapshot> documents) {
+       if (documents.isEmpty()) {
+           System.err.println("Usted actualmente no tiene notas");
+           return false;
+       }
+       return true;
+   }
 
     public static List<QueryDocumentSnapshot> getUserNotesCollection(User user){
         try {
             // Referencia al documento del usuario actual según su nombre de usuario
-            DocumentReference userRef = firestore.collection("users").document(user.getUserName());
+            DocumentReference userRef = FirestoreInitializer.getFirestore().collection("users").document(user.getUserName());
             //Se usa ApiFuture, que es clase que representa un resultado que estará disponible en el futuro.
             //Y QuerySnapshot, seria el contenedor de los resultados de busqueda. Es decir una lista de documentos que cumplen los requisitos de busqueda
             ApiFuture<QuerySnapshot> future = userRef.collection("notesList").get();
@@ -68,7 +63,7 @@ public class Read {
          System.out.println("aaa");
         return null;
 
-     }
+    }
 
      static int getNoteIndex(Scanner scanner, List<QueryDocumentSnapshot> documents ){
 
