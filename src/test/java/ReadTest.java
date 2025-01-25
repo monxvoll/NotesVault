@@ -28,7 +28,7 @@ public class ReadTest {
     public void testReadNotes(){
         Read read = new Read();
         read.readNotes(user);
-        //salida en consola
+        // salida en consola
     }
 
     @Test
