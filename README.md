@@ -1,7 +1,7 @@
 //Version Preeliminar
 # NotesVault
 
-NotesVault es una aplicación en la nube para gestionar notas. Permitiendo a los usuarios crear, leer, actualizar y eliminar notas fácilmente.
+NotesVault es una aplicación en la nube para gestionar notas. Permitiendo a los usuarios crear, leer, editar y eliminar notas fácilmente.
 
 ## Requisitos
 
