@@ -69,7 +69,7 @@ public class Register {
         return result.isValid();
     }
 
-    private boolean existsUserByName(String name) {
+    public boolean existsUserByName(String name) {
         System.out.println("Verificando .....");
         try {
             ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = firestore.collection("users").document(name).get();
