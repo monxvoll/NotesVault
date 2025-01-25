@@ -7,6 +7,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.api.core.ApiFuture;
+import util.FirestoreInitializer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,9 +19,9 @@ public class Register {
     private Scanner scanner;
     private Firestore firestore;
 
-    public Register() {
-        this.firestore = FirestoreClient.getFirestore(); // Inicializa Firestore
-        this.scanner = new Scanner(System.in);
+    public Register(Scanner scanner,Firestore firestore) {
+        this.firestore = firestore;
+        this.scanner = scanner;
     }
 
     public void registerUser() {
