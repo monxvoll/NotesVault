@@ -15,7 +15,7 @@ public class ReadTest {
     @BeforeAll
     public static void initializer(){
         FirebaseInitializer.initialize(); //inicializa firebase una sola vez ants de cada prueba
-        user = new User("OrionRat", "OrionRat123@");
+        user = new User("UsuarioParaPruebas", "UsuarioParaPruebas123@");
     }
 
     @Test
