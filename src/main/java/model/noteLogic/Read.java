@@ -43,7 +43,7 @@ public class Read {
         }
     }
 
-    static boolean hasNotes(List<QueryDocumentSnapshot> documents){
+   public static boolean hasNotes(List<QueryDocumentSnapshot> documents){
         if(documents.isEmpty()){
             System.err.println("Usted actualmente no tiene notas");
             return false;
@@ -51,7 +51,7 @@ public class Read {
         return true;
     }
 
-     static List<QueryDocumentSnapshot> getUserNotesCollection(User user){
+    public static List<QueryDocumentSnapshot> getUserNotesCollection(User user){
         try {
             // Referencia al documento del usuario actual según su nombre de usuario
             DocumentReference userRef = firestore.collection("users").document(user.getUserName());
