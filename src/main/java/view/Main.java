@@ -7,6 +7,8 @@ import controller.note.DeleteController;
 import controller.note.ReadController;
 import controller.note.UpdateControlller;
 import model.entities.User;
+import util.FirebaseInitializer;
+
 import java.util.Scanner;
 
 
