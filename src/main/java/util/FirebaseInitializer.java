@@ -1,4 +1,4 @@
-package model.util;
+package util;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
