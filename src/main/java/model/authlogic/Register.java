@@ -56,7 +56,7 @@ public class Register {
         }
     }
 
-    private boolean validatePassword(String password) {
+    public boolean validatePassword(String password) {
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
                 new LengthRule(8, 30), // Longitud minima de 8 y max de 30 caracteres
                 new CharacterRule(EnglishCharacterData.UpperCase, 1), // Al menos una mayuscula
@@ -85,7 +85,7 @@ public class Register {
         return name == null || name.isEmpty();
     }
 
-    private void saveUserToFirestore(User user) {
+    public void saveUserToFirestore(User user) {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("userName",user.getUserName());
         userMap.put("password",user.getPassword());
