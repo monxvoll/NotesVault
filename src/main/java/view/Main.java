@@ -2,10 +2,10 @@ package view;
 
 import controller.auth.LoginController;
 import controller.auth.RegisterController;
-import controller.note.CreateController;
-import controller.note.DeleteController;
-import controller.note.ReadController;
-import controller.note.UpdateControlller;
+import controller.crud.CreateController;
+import controller.crud.DeleteController;
+import controller.crud.ReadController;
+import controller.crud.UpdateControlller;
 import model.entities.User;
 import util.FirebaseInitializer;
 
