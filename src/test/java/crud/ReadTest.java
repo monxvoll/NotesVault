@@ -2,7 +2,7 @@ package crud;
 
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import model.entities.User;
-import model.noteLogic.Read;
+import model.crudLogic.Read;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import util.FirebaseInitializer;
