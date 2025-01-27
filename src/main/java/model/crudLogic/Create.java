@@ -54,9 +54,7 @@ public class Create {
                 // Añadir la nueva nota a la lista de notas del usuario
                 ApiFuture<WriteResult> future = notesRef.document(note.getId()).set(note);
 
-                //Obtener el resultado de la operacion asincrona
-                WriteResult result = future.get();
-                System.err.println("Nota guardada exitosamente."+result.getUpdateTime());
+                System.err.println("Nota guardada exitosamente.");
             } else {
                 System.out.println("Error: Usuario o nota no válidos.");
             }
@@ -65,7 +63,7 @@ public class Create {
         }
     }
 
-    static boolean checkIsNull(String title,String content) {
+    public static boolean checkIsNull(String title,String content) {
         if(title.isEmpty() || content.isEmpty()){
             System.err.println("Por favor digite un campo valido");
             return true;
