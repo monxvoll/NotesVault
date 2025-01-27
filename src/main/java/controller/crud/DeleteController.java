@@ -1,4 +1,4 @@
-package controller.note;
+package controller.crud;
 
 import model.entities.User;
 import model.noteLogic.Delete;
