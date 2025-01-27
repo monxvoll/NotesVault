@@ -1,4 +1,4 @@
-package CrudTest;
+package crud;
 
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import model.entities.User;
