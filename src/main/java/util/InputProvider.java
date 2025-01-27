@@ -1,0 +1,16 @@
+package util;
+
+import java.util.Scanner;
+
+public class InputProvider {
+    private Scanner scanner;
+
+    public InputProvider(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    public String nextLine() {
+        return scanner.nextLine();
+    }
+}
+
