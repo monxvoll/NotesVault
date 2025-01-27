@@ -1,7 +1,7 @@
 package controller.crud;
 
 import model.entities.User;
-import model.noteLogic.Delete;
+import model.crudLogic.Delete;
 
 import java.util.Scanner;
 

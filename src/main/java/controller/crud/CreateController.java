@@ -2,7 +2,7 @@ package controller.crud;
 
 import com.google.cloud.firestore.Firestore;
 import model.entities.User;
-import model.noteLogic.Create;
+import model.crudLogic.Create;
 import util.FirestoreInitializer;
 
 import java.util.Scanner;
