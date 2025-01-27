@@ -4,6 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import model.entities.Note;
 import model.entities.User;
+import util.InputProvider;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,19 +16,21 @@ public class Create {
 
     private LocalDateTime localDateTime;
     private String exclusiveId;
+    private InputProvider inputProvider;
     private Firestore firestore;
 
-    public Create(Firestore firestore){
+    public Create(InputProvider inputProvider,Firestore firestore){
+        this.inputProvider = inputProvider;
         this.localDateTime = LocalDateTime.now();
         this.exclusiveId = UUID.randomUUID().toString(); //Genera un ID unico utilizando UUID y lo convierte a String
         this.firestore = firestore;
     }
 
-    public void createNote(User user,Scanner scanner){
+    public void createNote(User user){
         System.out.println("Digite el titulo de la nota");
-        String title = scanner.nextLine();
+        String title = inputProvider.nextLine();
         System.out.println("Digite el contenido de la nota");
-        String content = scanner.nextLine();
+        String content = inputProvider.nextLine();
 
         if(!checkIsNull(title, content)) {
             DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
