@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 public class ReadTest {
     private static User user;
 
+    
     @BeforeAll
     public static void initializer(){
         FirebaseInitializer.initialize(); //inicializa firebase una sola vez ants de cada prueba
