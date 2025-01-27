@@ -1,7 +1,7 @@
 package controller.crud;
 
 import model.entities.User;
-import model.noteLogic.Read;
+import model.crudLogic.Read;
 
 public class ReadController {
     private Read read;

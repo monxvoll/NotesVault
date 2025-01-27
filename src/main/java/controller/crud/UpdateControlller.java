@@ -1,7 +1,7 @@
 package controller.crud;
 
 import model.entities.User;
-import model.noteLogic.Update;
+import model.crudLogic.Update;
 
 import java.util.Scanner;
 
