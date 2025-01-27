@@ -1,4 +1,4 @@
-package controller.note;
+package controller.crud;
 
 import com.google.cloud.firestore.Firestore;
 import model.entities.User;
