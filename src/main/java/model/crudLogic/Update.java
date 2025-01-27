@@ -1,4 +1,4 @@
-package model.noteLogic;
+package model.crudLogic;
 
 import com.google.cloud.firestore.*;
 import model.entities.Note;

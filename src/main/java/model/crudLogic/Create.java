@@ -1,8 +1,7 @@
-package model.noteLogic;
+package model.crudLogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import com.google.firebase.cloud.FirestoreClient;
 import model.entities.Note;
 import model.entities.User;
 
