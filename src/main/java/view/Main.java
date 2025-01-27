@@ -64,7 +64,7 @@ public class Main {
         switch (opt){
             case "1":
                 createController = new CreateController();
-                createController.createNote(user,scanner);
+                createController.createNote(user);
                 break;
             case "2":
                 readController = new ReadController();
