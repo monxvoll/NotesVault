@@ -4,6 +4,7 @@ import com.google.cloud.firestore.Firestore;
 import model.authlogic.Login;
 import model.entities.User;
 import util.FirestoreInitializer;
+import util.InputProvider;
 
 import java.util.Scanner;
 
@@ -12,8 +13,9 @@ public class LoginController {
 
         public LoginController() {
             Scanner scanner = new Scanner(System.in);
+            InputProvider inputProvider = new InputProvider(scanner);
             Firestore firestore = FirestoreInitializer.getFirestore();
-            this.login = new Login(scanner,firestore);
+            this.login = new Login(inputProvider,firestore);
         }
 
         public boolean login() {

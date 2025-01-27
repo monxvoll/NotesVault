@@ -1,3 +1,4 @@
+package CrudTest;
 
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import model.entities.User;
@@ -34,10 +35,11 @@ public class ReadTest {
     @Test
     public void testHasNotes(){
         List<QueryDocumentSnapshot> emptyList = List.of(); //lista vacia de documentos
-        assertFalse(Read.hasNotes(emptyList),"El usuario no deberia tener notas");
+        assertFalse(Read.hasNotes(emptyList),"La lista no deberia tener notas");
+
         QueryDocumentSnapshot mockDocument = mock(QueryDocumentSnapshot.class); //se usa mockito para crear un objeto simulado "mockDocument"
         List<QueryDocumentSnapshot> list = List.of(mockDocument); //lista que contiene notas simuladas
-        assertTrue(Read.hasNotes(list),"El usuario deberia tener notas");
+        assertTrue(Read.hasNotes(list),"La lista deberia tener notas");
     }
 
 }
