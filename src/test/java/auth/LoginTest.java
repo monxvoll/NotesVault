@@ -83,7 +83,7 @@ public class LoginTest {
     public void testValidateInputs_NullPassword() {
         boolean result = login.validateInputs("validUser", "");
 
-        assertFalse(result, "El resultado debería ser false, ya que la contraseña es null.");
+        assertFalse(result, "El resultado deberia ser false, ya que la contraseña es null.");
     }
 
 
@@ -91,7 +91,7 @@ public class LoginTest {
     public void testValidateInputs_NullNameAndNullPassword() {
         boolean result = login.validateInputs("", "");
 
-        assertFalse(result, "El resultado debería ser false, ya que tanto el nombre y contraseña son null.");
+        assertFalse(result, "El resultado deberia ser false, ya que tanto el nombre y contraseña son null.");
     }
 
 }
