@@ -1,3 +1,5 @@
+package authTest;
+
 import com.google.cloud.firestore.Firestore;
 import model.authlogic.Register;
 import model.entities.User;

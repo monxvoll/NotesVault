@@ -7,67 +7,65 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import model.entities.User;
 import org.mindrot.jbcrypt.BCrypt;
-
-
+import util.InputProvider;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class Login {
     private Firestore firestore;
-    private Scanner scanner ;
+    private InputProvider inputProvider;
     private User actualUser;
 
-    public Login (Scanner scanner,Firestore firestore){
-        this.scanner = scanner;
+
+    public Login(InputProvider inputProvider, Firestore firestore) {
+        this.inputProvider = inputProvider;
         this.firestore = firestore;
     }
 
-    public boolean loginUser(){
+    public boolean loginUser() {
         System.out.println("Por favor digite el nombre de usuario");
-        String name = scanner.nextLine();
+        String name = inputProvider.nextLine();
         System.out.println("Por favor digite la contraseña");
-        String password = scanner.nextLine();
+        String password = inputProvider.nextLine();
         return validateInputs(name, password);
     }
 
-    private boolean validateInputs(String name,String password){
 
-        if(name==null||name.isEmpty())  {
+    public boolean validateInputs(String name, String password) {
+        if (name == null || name.isEmpty()) {
             System.err.println("El nombre es obligatorio");
-        }else if (password==null||password.isEmpty()) {
+        } else if (password == null || password.isEmpty()) {
             System.err.println("La contraseña es obligatoria ");
-        }else {
-           return compareInfo(name, password);
+        } else {
+            return compareInfo(name, password);
         }
         return false;
     }
 
-    private boolean compareInfo(String name , String password){
+    private boolean compareInfo(String name, String password) {
         ApiFuture<QuerySnapshot> future = firestore.collection("users").get();
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            for (QueryDocumentSnapshot document : documents){
+            for (QueryDocumentSnapshot document : documents) {
                 String registeredUserName = document.getString("userName");
                 String registeredUserPassword = document.getString("password");
 
                 if (registeredUserName.equals(name) && BCrypt.checkpw(password, registeredUserPassword)) {
-                    actualUser = new User(name,password);
-                    System.err.println("Sesion iniciada correctamente");
-                     return true;
+                    actualUser = new User(name, password);
+                    System.err.println("Sesión iniciada correctamente");
+                    return true;
                 }
             }
 
             System.err.println("Contraseña y/o usuario incorrectos");
             return false;
-
         } catch (ExecutionException | InterruptedException e) {
-            System.err.println("Error al traer los usuarios "+e);
+            System.err.println("Error al traer los usuarios " + e);
             return false;
         }
     }
 
-    public User getActualUser(){
+    public User getActualUser() {
         return actualUser;
     }
 }
