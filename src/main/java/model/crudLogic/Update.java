@@ -3,12 +3,14 @@ package model.crudLogic;
 import com.google.cloud.firestore.*;
 import model.entities.Note;
 import model.entities.User;
+import util.InputProvider;
+
 import java.util.List;
 import java.util.Scanner;
 
 public class Update {
 
-    public void updateNote(User user , Scanner scanner)  {
+    public void updateNote(User user , InputProvider inputProvider)  {
         try {
             List<QueryDocumentSnapshot> documents = Read.getUserNotesCollection(user);
 
@@ -18,7 +20,7 @@ public class Update {
                 if (Read.hasNotes(documents)) {
                     Read.enumerateNotes(documents);
 
-                    int noteIndex = Read.getNoteIndex(scanner,documents);
+                    int noteIndex = Read.getNoteIndex(inputProvider,documents);
                     if(noteIndex== -1) return;
 
                     QueryDocumentSnapshot documentNote = documents.get(noteIndex );
@@ -27,9 +29,9 @@ public class Update {
                     System.out.println("Contenido Anterior : " + note.getContent());
 
                     System.out.println("Por favor ingrese el nuevo titulo: ");
-                    String newTitle = scanner.nextLine();
+                    String newTitle = inputProvider.nextLine();
                     System.out.println("Por favor ingrese el nuevo contenido: ");
-                    String newContent = scanner.nextLine();
+                    String newContent = inputProvider.nextLine();
 
                     if(!Create.checkIsNull(newTitle, newContent)) {
                         note.setTitle(newTitle);
