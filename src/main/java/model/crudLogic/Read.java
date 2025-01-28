@@ -5,9 +5,9 @@ import com.google.cloud.firestore.*;
 import model.entities.Note;
 import model.entities.User;
 import util.FirestoreInitializer;
+import util.InputProvider;
 
 import java.util.List;
-import java.util.Scanner;
 
 
 public class Read {
@@ -65,11 +65,11 @@ public class Read {
 
     }
 
-     static int getNoteIndex(Scanner scanner, List<QueryDocumentSnapshot> documents ){
+     static int getNoteIndex(InputProvider inputProvider, List<QueryDocumentSnapshot> documents ){
 
         System.out.println("Por favor ingrese el número de la nota que desea actualizar : ");
-        int noteIndex = scanner.nextInt();
-        scanner.nextLine();
+        int noteIndex = inputProvider.nextInt();
+        inputProvider.nextLine();
 
         if (noteIndex < 1 || noteIndex > documents.size()) {
             System.err.println("Por favor ingrese un número válido");
