@@ -12,5 +12,9 @@ public class InputProvider {
     public String nextLine() {
         return scanner.nextLine();
     }
+
+    public int nextInt() {
+        return scanner.nextInt();
+    }
 }
 
