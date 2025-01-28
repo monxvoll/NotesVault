@@ -2,6 +2,7 @@ package controller.crud;
 
 import model.entities.User;
 import model.crudLogic.Update;
+import util.InputProvider;
 
 import java.util.Scanner;
 
@@ -11,6 +12,7 @@ public class UpdateControlller {
       this.update = new Update();
     }
      public void updateNote(User user, Scanner scanner){
-         update.updateNote(user,scanner);
+         InputProvider inputProvider = new InputProvider(scanner);
+         update.updateNote(user,inputProvider);
      }
 }

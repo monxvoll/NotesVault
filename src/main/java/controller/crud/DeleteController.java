@@ -2,6 +2,7 @@ package controller.crud;
 
 import model.entities.User;
 import model.crudLogic.Delete;
+import util.InputProvider;
 
 import java.util.Scanner;
 
@@ -13,6 +14,7 @@ public class DeleteController {
     }
 
     public void deleteNote(User user, Scanner scanner) {
-     delete.removeNoteByName(user,scanner);
+        InputProvider inputProvider = new InputProvider(scanner);
+        delete.removeNoteByName(user,inputProvider);
     }
 }
