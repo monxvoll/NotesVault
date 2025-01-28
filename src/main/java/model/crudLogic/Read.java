@@ -31,7 +31,7 @@ public class Read {
         }
     }
 
-    static void enumerateNotes(List<QueryDocumentSnapshot> documents){
+    public static void enumerateNotes(List<QueryDocumentSnapshot> documents){
         for (int i = 1; i <=documents.size() ; i++) {
             Note note = documents.get(i - 1).toObject(Note.class);
             System.out.println(i + ". " + note);
@@ -65,7 +65,7 @@ public class Read {
 
     }
 
-     static int getNoteIndex(InputProvider inputProvider, List<QueryDocumentSnapshot> documents ){
+    public static int getNoteIndex(InputProvider inputProvider, List<QueryDocumentSnapshot> documents ){
 
         System.out.println("Por favor ingrese el número de la nota que desea actualizar : ");
         int noteIndex = inputProvider.nextInt();
