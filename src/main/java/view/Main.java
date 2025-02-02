@@ -1,5 +1,6 @@
 package view;
 
+import controller.auth.DeleteAccountController;
 import controller.auth.LoginController;
 import controller.auth.RegisterController;
 import controller.crud.CreateController;
@@ -18,6 +19,8 @@ public class Main {
    private static ReadController readController;
    private static DeleteController deleteController;
    private static UpdateControlller updateControlller;
+   private static DeleteAccountController deleteAccountController;
+
    private static boolean flag = true;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -55,6 +58,7 @@ public class Main {
             System.out.println("3. Editar una nota");
             System.out.println("4. Eliminar una nota");
             System.out.println("5. Cerrar Sesion");
+            System.out.println("6. Eliminar cuenta");
             String opt = scanner.nextLine();
             executeOption(opt, user,scanner);
         }
@@ -80,6 +84,12 @@ public class Main {
                 break;
             case "5":
                 setFlagTrue();
+                break;
+            case "6" :
+                deleteAccountController = new DeleteAccountController();
+                if(deleteAccountController.deleteAccount(user)){
+                    setFlagTrue();
+                }
                 break;
             default:
                 System.out.println("Por favor digite una opcion valida");
