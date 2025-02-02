@@ -1,4 +1,4 @@
-package view;
+package view.gui;
 
 import model.entities.User;
 import util.FirebaseInitializer;
