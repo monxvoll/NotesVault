@@ -9,7 +9,7 @@ import util.InputProvider;
 import java.util.Scanner;
 
 public class LoginController {
-        private Login login ;
+        public Login login ;
 
         public LoginController() {
             Scanner scanner = new Scanner(System.in);
@@ -23,6 +23,6 @@ public class LoginController {
         }
 
         public User getActualUser(){
-            return login.getActualUser();
+            return login.getCurrentUser();
         }
 }

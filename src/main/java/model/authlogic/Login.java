@@ -4,7 +4,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.cloud.FirestoreClient;
 import model.entities.User;
 import org.mindrot.jbcrypt.BCrypt;
 import util.InputProvider;
@@ -14,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 public class Login {
     private Firestore firestore;
     private InputProvider inputProvider;
-    private User actualUser;
+    private User currentUser;
 
 
     public Login(InputProvider inputProvider, Firestore firestore) {
@@ -42,7 +41,8 @@ public class Login {
         return false;
     }
 
-    private boolean compareInfo(String name, String password) {
+
+    private boolean compareInfo( String name, String password) {
         ApiFuture<QuerySnapshot> future = firestore.collection("users").get();
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
@@ -51,7 +51,8 @@ public class Login {
                 String registeredUserPassword = document.getString("password");
 
                 if (registeredUserName.equals(name) && BCrypt.checkpw(password, registeredUserPassword)) {
-                    actualUser = new User(name, password);
+                    String email = document.getString("email");
+                    currentUser = new User(email,name, password);
                     System.err.println("Sesión iniciada correctamente");
                     return true;
                 }
@@ -65,7 +66,9 @@ public class Login {
         }
     }
 
-    public User getActualUser() {
-        return actualUser;
+    public User getCurrentUser() {
+        return currentUser;
     }
+
+
 }

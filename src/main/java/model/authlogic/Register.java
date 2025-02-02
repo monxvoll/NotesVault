@@ -1,13 +1,12 @@
 package model.authlogic;
 
 import model.entities.User;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.passay.*;
 
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.cloud.FirestoreClient;
 import com.google.api.core.ApiFuture;
-import util.FirestoreInitializer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,21 +18,37 @@ public class Register {
     private Scanner scanner;
     private Firestore firestore;
 
-    public Register(Scanner scanner,Firestore firestore) {
+    public Register(Scanner scanner, Firestore firestore) {
         this.firestore = firestore;
         this.scanner = scanner;
     }
 
     public void registerUser() {
-        User user = new User(recieveName(), recievePassword());
+        User user = new User(recieveEmail(), recieveName(), recievePassword());
         System.err.println("Registro exitoso");
         saveUserToFirestore(user); // Guarda el usuario en Firestore
+    }
+
+
+    private String recieveEmail() {
+        EmailValidator validator = EmailValidator.getInstance();
+        while (true) {
+            System.out.println("Por favor digite una direccion de correo electronico");
+            String email = scanner.nextLine();
+
+            if (validator.isValid(email)) {
+                return email;
+            } else {
+                System.err.println("Por favor digite un correo electronico valido");
+            }
+        }
     }
 
     private String recieveName() {
         while (true) {
             System.out.println("Por favor digite un nombre de usuario");
             String name = scanner.nextLine();
+
             if (existsUserByName(name)) {
                 System.err.println("Este nombre de usuario ya existe");
             } else if (isEmpty(name)) {
@@ -43,6 +58,7 @@ public class Register {
             }
         }
     }
+
 
     private String recievePassword() {
         while (true) {
@@ -81,12 +97,14 @@ public class Register {
         }
     }
 
+
     private boolean isEmpty(String name) {
         return name == null || name.isEmpty();
     }
 
     public void saveUserToFirestore(User user) {
         Map<String, Object> userMap = new HashMap<>();
+        userMap.put("email",user.getEmail());
         userMap.put("userName",user.getUserName());
         userMap.put("password",user.getPassword());
 

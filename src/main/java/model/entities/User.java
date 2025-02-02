@@ -7,11 +7,14 @@ import java.util.List;
 
 public class User {
 
+    private String email;
     private String userName;
     private String password;
+
     private List<Note> notesList;
 
-    public User(String userName, String password) {
+    public User(String email,String userName, String password) {
+        this.email = email;
         this.userName = userName;
         this.password = hashPassword(password);
         notesList = new ArrayList<>();
@@ -39,6 +42,10 @@ public class User {
 
     public void setNotesList(List<Note> noteList) {
         this.notesList = noteList;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     private String hashPassword(String password) {

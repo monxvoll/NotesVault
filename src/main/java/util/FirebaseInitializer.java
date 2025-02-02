@@ -12,7 +12,7 @@ public class FirebaseInitializer {
     public static void initialize() {
         try {
             // Crea un flujo de entrada para leer el archivo de claves JSON
-            FileInputStream serviceAccount = new FileInputStream("resources/key.json"); //Ruta al json con las credenciales
+            FileInputStream serviceAccount = new FileInputStream("resources/firestore-credentials.json"); //Ruta al json con las credenciales
 
             // Construye las opciones de Firebase con las credenciales obtenidas del archivo JSON y la URL de la base de datos
             FirebaseOptions options = new FirebaseOptions.Builder()
