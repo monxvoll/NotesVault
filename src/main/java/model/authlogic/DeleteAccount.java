@@ -81,14 +81,26 @@ public class DeleteAccount {
            for (QueryDocumentSnapshot document : documents){
                document.getReference().delete();
            }
+
            //Eliminar documento
            DocumentReference document  = firestore.collection("users").document(user.getUserName());
            document.delete();
 
            System.out.println("Cuenta eliminada exitosamente");
             return true;
-       } catch (ExecutionException | InterruptedException e) {
-            System.err.println("Error al eliminar el usuario: " + e.getMessage());
+       } catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+           System.err.println("La operación fue interrumpida: " + e.getMessage());
+           e.printStackTrace();
+       } catch (ExecutionException e) {
+           System.err.println("Error al eliminar el usuario: " + e.getCause().getMessage());
+           e.printStackTrace();
+       } catch (FirestoreException e) {
+           System.err.println("Error de Firestore al eliminar el usuario: " + e.getMessage());
+           e.printStackTrace();
+       } catch (Exception e) {
+           System.err.println("Error inesperado: " + e.getMessage());
+           e.printStackTrace();
        }
        return false;
    }

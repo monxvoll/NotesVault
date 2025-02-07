@@ -53,7 +53,14 @@ public class Update {
                     }
                 }
             }
-        }catch (Exception e) {
+        }catch (NullPointerException e) {
+            System.err.println("Error: No se encontraron notas o algún valor es nulo. " + e.getMessage());
+            e.printStackTrace();
+        } catch (FirestoreException e) {
+            System.err.println("Error de Firestore al actualizar la nota: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
     }
