@@ -5,11 +5,17 @@ import model.entities.Note;
 import model.entities.User;
 import util.InputProvider;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
 public class Update {
+    private LocalDateTime localDateTime;
 
+    public Update(){
+        this.localDateTime = LocalDateTime.now();
+    }
     public void updateNote(User user , InputProvider inputProvider)  {
         try {
             List<QueryDocumentSnapshot> documents = Read.getUserNotesCollection(user);
@@ -34,8 +40,12 @@ public class Update {
                     String newContent = inputProvider.nextLine();
 
                     if(!Create.checkIsNull(newTitle, newContent)) {
+                        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                        String date = localDateTime.format(format);
+
                         note.setTitle(newTitle);
                         note.setContent(newContent);
+                        note.setDate(date);
 
                         documentNote.getReference().set(note);
 
