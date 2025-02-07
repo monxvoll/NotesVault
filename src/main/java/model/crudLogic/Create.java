@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 
 public class Create {
@@ -35,7 +36,6 @@ public class Create {
         if(!checkIsNull(title, content)) {
             DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             String date = localDateTime.format(format);
-            System.out.println(exclusiveId);
             Note note = new Note(title, content, date, exclusiveId);
             addNote(user, note);
         }
@@ -53,12 +53,21 @@ public class Create {
 
                 // Añadir la nueva nota a la lista de notas del usuario
                 ApiFuture<WriteResult> future = notesRef.document(note.getId()).set(note);
+                WriteResult result = future.get();
 
-                System.err.println("Nota guardada exitosamente.");
+                System.err.println("Nota guardada exitosamente en Firestore en: " + result.getUpdateTime());
             } else {
                 System.out.println("Error: Usuario o nota no válidos.");
             }
+
+        } catch (InterruptedException e) {
+            System.err.println("Error al guardar la nota (interrupción del hilo): " + e.getMessage());
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            System.err.println("Error al guardar la nota en Firestore: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
     }

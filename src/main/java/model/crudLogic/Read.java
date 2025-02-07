@@ -8,6 +8,7 @@ import util.FirestoreInitializer;
 import util.InputProvider;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class Read {
@@ -57,12 +58,18 @@ public class Read {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
             return documents;
-        }catch (Exception e){
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();  // Restablece el estado de interrupción
+            System.err.println("La operación fue interrumpida: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            System.err.println("Error durante la ejecución de la consulta: " + e.getCause().getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
-         System.out.println("aaa");
         return null;
-
     }
 
     public static int getNoteIndex(InputProvider inputProvider, List<QueryDocumentSnapshot> documents ){

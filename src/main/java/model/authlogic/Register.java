@@ -104,20 +104,24 @@ public class Register {
 
     public void saveUserToFirestore(User user) {
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("email",user.getEmail());
-        userMap.put("userName",user.getUserName());
-        userMap.put("password",user.getPassword());
+        userMap.put("email", user.getEmail());
+        userMap.put("userName", user.getUserName());
+        userMap.put("password", user.getPassword());
 
-        // Accede a la coleccion "users" si no existe la crea . Dentro de ella se crea un usuario cuyo id es el nombre y se anexa su info
         ApiFuture<WriteResult> future = firestore.collection("users").document(user.getUserName()).set(userMap);
+
         try {
-            // Obtiene el resultado de la operación de escritura
             WriteResult result = future.get();
             System.err.println("Usuario guardado exitosamente en Firestore en: " + result.getUpdateTime());
-        } catch (InterruptedException | ExecutionException e) {
-            System.err.println("Error al guardar el usuario en Firestore: " + e);
+        } catch (InterruptedException e) {
+            System.err.println("Error al guardar el usuario en Firestore (interrupción): " + e.getMessage());
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            System.err.println("Error al guardar el usuario en Firestore: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
 
 
 }

@@ -7,11 +7,17 @@ import util.InputProvider;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 public class Delete {
 
-    public void removeNoteByName(User user, InputProvider inputProvider){
+    public void removeNoteByName(User user, InputProvider inputProvider) {
         try {
+            if (user == null || user.getUserName() == null) {
+                System.err.println("Error: Usuario no válido.");
+                return;
+            }
+
             List<QueryDocumentSnapshot> documents = Read.getUserNotesCollection(user);
 
                 if (documents == null) {
@@ -28,7 +34,8 @@ public class Delete {
                     }
                 }
         } catch (Exception e) {
-           e.printStackTrace();
+            System.err.println("Error inesperado: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

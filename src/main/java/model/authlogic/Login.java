@@ -60,10 +60,14 @@ public class Login {
 
             System.err.println("Contraseña y/o usuario incorrectos");
             return false;
-        } catch (ExecutionException | InterruptedException e) {
-            System.err.println("Error al traer los usuarios " + e);
-            return false;
+        } catch (InterruptedException e) {
+            System.err.println("Error al traer los usuarios (interrupción): " + e.getMessage());
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            System.err.println("Error al traer los usuarios: " + e.getMessage());
+            e.printStackTrace();
         }
+        return false;
     }
 
     public User getCurrentUser() {
