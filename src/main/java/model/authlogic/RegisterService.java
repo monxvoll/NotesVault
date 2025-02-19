@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-public class Register {
+public class RegisterService {
     private Scanner scanner;
     private Firestore firestore;
 
-    public Register(Scanner scanner, Firestore firestore) {
+    public RegisterService(Scanner scanner, Firestore firestore) {
         this.firestore = firestore;
         this.scanner = scanner;
     }
