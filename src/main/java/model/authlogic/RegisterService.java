@@ -7,102 +7,64 @@ import org.passay.*;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.api.core.ApiFuture;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
+@Service // Marca la clase como un servicio
 public class RegisterService {
-    private Scanner scanner;
-    private Firestore firestore;
 
-    public RegisterService(Scanner scanner, Firestore firestore) {
-        this.firestore = firestore;
-        this.scanner = scanner;
-    }
+    @Autowired
+    private Firestore firestore; // Firestore se inyecta automaticamente evitando crear la instancia new..
 
-    public void registerUser() {
-        User user = new User(recieveEmail(), recieveName(), recievePassword());
-        System.err.println("Registro exitoso");
-        saveUserToFirestore(user); // Guarda el usuario en Firestore
-    }
+    public void registerUser(User user) throws Exception {
+        if (existsUserByName(user.getUserName())) {
+            throw new IllegalArgumentException("Este nombre de usuario ya existe");
+        }
+        if (!validateEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Correo electrónico inválido");
+        }
+        if (!validatePassword(user.getPassword())) {
+            throw new IllegalArgumentException("Contraseña inválida (8-30 caracteres, una mayúscula, un dígito y un símbolo)");
+        }
 
-
-    private String recieveEmail() {
-        EmailValidator validator = EmailValidator.getInstance();
-        while (true) {
-            System.out.println("Por favor digite una direccion de correo electronico");
-            String email = scanner.nextLine();
-
-            if (validator.isValid(email)) {
-                return email;
-            } else {
-                System.err.println("Por favor digite un correo electronico valido");
-            }
+        boolean success = saveUserToFirestore(user);
+        if (!success) {
+            throw new Exception("Error al guardar el usuario en Firestore");
         }
     }
 
-    private String recieveName() {
-        while (true) {
-            System.out.println("Por favor digite un nombre de usuario");
-            String name = scanner.nextLine();
-
-            if (existsUserByName(name)) {
-                System.err.println("Este nombre de usuario ya existe");
-            } else if (isEmpty(name)) {
-                System.err.println("El nombre de usuario es obligatorio");
-            } else {
-                return name;
-            }
-        }
-    }
-
-
-    private String recievePassword() {
-        while (true) {
-            System.out.println("Por favor digite una contraseña");
-            String password = scanner.nextLine();
-            if (!validatePassword(password)) {
-                System.err.println("Por favor digite una contraseña valida (8-30 caracteres/Al menos una mayuscula/Al menos un digito/Al menos un simbolo)");
-            } else {
-                return password;
-            }
-        }
+    private boolean validateEmail(String email) {
+        return EmailValidator.getInstance().isValid(email);
     }
 
     public boolean validatePassword(String password) {
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
-                new LengthRule(8, 30), // Longitud minima de 8 y max de 30 caracteres
-                new CharacterRule(EnglishCharacterData.UpperCase, 1), // Al menos una mayuscula
+                new LengthRule(8, 30),
+                new CharacterRule(EnglishCharacterData.UpperCase, 1),
                 new CharacterRule(EnglishCharacterData.LowerCase, 1),
-                new CharacterRule(EnglishCharacterData.Digit, 1), // Al menos un digito
-                new CharacterRule(EnglishCharacterData.Special, 1), // Al menos un caracter especial
-                new WhitespaceRule()));
-        RuleResult result = validator.validate(new PasswordData(password));
-
-        return result.isValid();
+                new CharacterRule(EnglishCharacterData.Digit, 1),
+                new CharacterRule(EnglishCharacterData.Special, 1),
+                new WhitespaceRule()
+        ));
+        return validator.validate(new PasswordData(password)).isValid();
     }
 
     public boolean existsUserByName(String name) {
-        System.out.println("Verificando .....");
         try {
             ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = firestore.collection("users").document(name).get();
-            com.google.cloud.firestore.DocumentSnapshot document = future.get();
-            return document.exists();
+            return future.get().exists();
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al verificar el usuario en Firestore: " + e);
             return false;
         }
     }
 
-
-    private boolean isEmpty(String name) {
-        return name == null || name.isEmpty();
-    }
-
-    public void saveUserToFirestore(User user) {
+    public boolean saveUserToFirestore(User user) {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("email", user.getEmail());
         userMap.put("userName", user.getUserName());
@@ -112,16 +74,12 @@ public class RegisterService {
 
         try {
             WriteResult result = future.get();
-            System.err.println("Usuario guardado exitosamente en Firestore en: " + result.getUpdateTime());
-        } catch (InterruptedException e) {
-            System.err.println("Error al guardar el usuario en Firestore (interrupción): " + e.getMessage());
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
+            System.out.println("Usuario guardado exitosamente en Firestore en: " + result.getUpdateTime());
+            return true;
+        } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al guardar el usuario en Firestore: " + e.getMessage());
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
-
-
-
 }
