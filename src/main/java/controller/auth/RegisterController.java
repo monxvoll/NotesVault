@@ -2,6 +2,7 @@ package controller.auth;
 
 import model.authlogic.RegisterService;
 import model.entities.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class RegisterController {
 
     private final RegisterService registerService;
+    @Autowired
     public RegisterController(RegisterService registerService) {
         this.registerService = registerService;
     }
