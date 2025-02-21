@@ -26,12 +26,12 @@ public class RegisterController {
     @PostMapping("/register") // Define que este método responde a solicitudes POST en /auth/register
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         try {
-            registerService.registerUser(user); // Llama al servicio para registrar el usuario
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso"); // Responde con 201 CREATED
+            registerService.registerUser(user); 
+            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // Error 400 si los datos no son válidos
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en el servidor"); // Error 500 en caso de fallo interno
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en el servidor");
         }
     }
 }
