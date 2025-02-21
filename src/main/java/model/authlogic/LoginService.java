@@ -6,43 +6,41 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import model.entities.User;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.stereotype.Service;
 import util.InputProvider;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@Service
 public class Login {
     private Firestore firestore;
-    private InputProvider inputProvider;
-    private User currentUser;
 
 
-    public Login(InputProvider inputProvider, Firestore firestore) {
-        this.inputProvider = inputProvider;
+    public Login(Firestore firestore) {
         this.firestore = firestore;
     }
 
-    public boolean loginUser() {
-        System.out.println("Por favor digite el nombre de usuario");
-        String name = inputProvider.nextLine();
-        System.out.println("Por favor digite la contraseña");
-        String password = inputProvider.nextLine();
-        return validateInputs(name, password);
-    }
-
-
-    public boolean validateInputs(String name, String password) {
-        if (name == null || name.isEmpty()) {
-            System.err.println("El nombre es obligatorio");
-        } else if (password == null || password.isEmpty()) {
-            System.err.println("La contraseña es obligatoria ");
-        } else {
-            return compareInfo(name, password);
+    public User loginUser(String name ,String password) {
+        validateInputs(name, password);
+        User user = compareInfo(name, password);
+        if(user==null){
+            throw new IllegalArgumentException("Contraseña y/o usuario incorrectos");
         }
-        return false;
+        return user;
     }
 
 
-    private boolean compareInfo( String name, String password) {
+    public void validateInputs(String name, String password) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("El nombre es obligatorio");
+        }
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria ");
+        }
+    }
+
+
+    private User compareInfo(String name, String password) {
         ApiFuture<QuerySnapshot> future = firestore.collection("users").get();
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
@@ -52,14 +50,10 @@ public class Login {
 
                 if (registeredUserName.equals(name) && BCrypt.checkpw(password, registeredUserPassword)) {
                     String email = document.getString("email");
-                    currentUser = new User(email,name, password);
-                    System.err.println("Sesión iniciada correctamente");
-                    return true;
+                    return new User(email, name, password);
                 }
             }
-
-            System.err.println("Contraseña y/o usuario incorrectos");
-            return false;
+            throw new IllegalArgumentException("Contraseña y/o usuario incorrectos");
         } catch (InterruptedException e) {
             System.err.println("Error al traer los usuarios (interrupción): " + e.getMessage());
             Thread.currentThread().interrupt();
@@ -67,12 +61,7 @@ public class Login {
             System.err.println("Error al traer los usuarios: " + e.getMessage());
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
-
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
 
 }
