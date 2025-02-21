@@ -26,7 +26,7 @@ public class LoginPanel extends JPanel {
         super();
         setBackground(new Color(255, 255, 255));
         this.mainApp = mainApp;
-        loginController = new LoginController();
+       // loginController = new LoginController();
 
         mainApp.showPanel("login");
         setLayout(new BorderLayout());
@@ -128,11 +128,11 @@ public class LoginPanel extends JPanel {
     }
 
     public void handleLogin(ActionEvent e){
-        if(loginController.login.validateInputs(userName.getText(), new String(password.getPassword()))){
+       /* if(loginController.login.validateInputs(userName.getText(), new String(password.getPassword()))){
             mainApp.setCurrentUser(loginController.getActualUser());
             mainApp.showPanel("dashboard");
         }else {
             JOptionPane.showMessageDialog(this, "Credenciales incorrectas");
-        }
+        }*/
     }
 }
