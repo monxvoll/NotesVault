@@ -1,28 +1,36 @@
 package controller.auth;
 
-import com.google.cloud.firestore.Firestore;
-import model.authlogic.Login;
+
+import model.authlogic.LoginService;
 import model.entities.User;
-import util.FirestoreInitializer;
-import util.InputProvider;
+import model.entities.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Scanner;
-
+@RestController
+@RequestMapping("/auth")
 public class LoginController {
-        public Login login ;
 
-        public LoginController() {
-            Scanner scanner = new Scanner(System.in);
-            InputProvider inputProvider = new InputProvider(scanner);
-            Firestore firestore = FirestoreInitializer.getFirestore();
-            this.login = new Login(inputProvider,firestore);
+        private final LoginService loginService ;
+
+        @Autowired
+        public LoginController(LoginService loginService) {
+            this.loginService = loginService;
         }
 
-        public boolean login() {
-            return login.loginUser();
+
+
+        @PostMapping("/login")
+        public ResponseEntity<?> loginUser(@RequestParam String username, @RequestParam String password){
+            try {
+                UserDTO loggedUser = loginService.loginUser(username, password);
+                return ResponseEntity.ok(loggedUser); //se retorna el usuario ( unicamente su nombre e email )
+            }catch (IllegalArgumentException e){
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }catch (Exception e) {
+                return ResponseEntity.internalServerError().body("Error en el servidor");
+            }
         }
 
-        public User getActualUser(){
-            return login.getCurrentUser();
-        }
 }
