@@ -5,28 +5,27 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import model.entities.User;
+import model.entities.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import util.InputProvider;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class Login {
+public class LoginService {
     private Firestore firestore;
 
 
-    public Login(Firestore firestore) {
+    public LoginService(Firestore firestore) {
         this.firestore = firestore;
     }
 
-    public User loginUser(String name ,String password) {
+    public UserDTO loginUser(String name , String password) {
         validateInputs(name, password);
-        User user = compareInfo(name, password);
-        if(user==null){
-            throw new IllegalArgumentException("Contraseña y/o usuario incorrectos");
-        }
-        return user;
+        return compareInfo(name, password);
     }
 
 
@@ -40,28 +39,33 @@ public class Login {
     }
 
 
-    private User compareInfo(String name, String password) {
-        ApiFuture<QuerySnapshot> future = firestore.collection("users").get();
+    private UserDTO compareInfo(String name, String password) {
+        ApiFuture<QuerySnapshot> future = firestore.collection("users")
+                .whereEqualTo("userName", name) //Ahora se filtra directamente en Firestore
+                .get();
+
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            for (QueryDocumentSnapshot document : documents) {
-                String registeredUserName = document.getString("userName");
-                String registeredUserPassword = document.getString("password");
-
-                if (registeredUserName.equals(name) && BCrypt.checkpw(password, registeredUserPassword)) {
-                    String email = document.getString("email");
-                    return new User(email, name, password);
-                }
+            if (documents.isEmpty()) {
+                throw new IllegalArgumentException("Usuario no encontrado");
             }
-            throw new IllegalArgumentException("Contraseña y/o usuario incorrectos");
+
+            QueryDocumentSnapshot document = documents.get(0);
+            String registeredUserPassword = document.getString("password");
+
+            if (!BCrypt.checkpw(password, registeredUserPassword)) {
+                throw new IllegalArgumentException("Contraseña incorrecta");
+            }
+
+            String email = document.getString("email");
+            return new UserDTO(email, name);
+
         } catch (InterruptedException e) {
-            System.err.println("Error al traer los usuarios (interrupción): " + e.getMessage());
             Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al traer los usuarios", e);
         } catch (ExecutionException e) {
-            System.err.println("Error al traer los usuarios: " + e.getMessage());
-            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al traer los usuarios", e);
         }
-        return null;
     }
 
 }
