@@ -72,21 +72,13 @@ public class DeleteAccount {
 
 
    private boolean executeElimination(User user){
-       CollectionReference notesCollection = firestore.collection("users").document(user.getUserName()).collection("notesList");
-       ApiFuture<QuerySnapshot> future = notesCollection.get();
-        //Eliminar subcolecciones
        try {
-          List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            DocumentReference document = firestore.collection("users").document(user.getUserName());
 
-           for (QueryDocumentSnapshot document : documents){
-               document.getReference().delete();
-           }
+            ApiFuture<WriteResult> future = document.update("isActive",false); //Se marca la cuenta como inactiva, en lugar de eliminarla
+            future.get();  //Esperar
 
-           //Eliminar documento
-           DocumentReference document  = firestore.collection("users").document(user.getUserName());
-           document.delete();
-
-           System.out.println("Cuenta eliminada exitosamente");
+            System.out.println("Cuenta eliminada exitosamente");
             return true;
        } catch (InterruptedException e) {
            Thread.currentThread().interrupt();
