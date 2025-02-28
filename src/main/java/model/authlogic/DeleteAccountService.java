@@ -5,95 +5,87 @@ import com.google.cloud.firestore.*;
 import model.crudLogic.Create;
 import model.entities.User;
 import org.mindrot.jbcrypt.BCrypt;
-import util.InputProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class DeleteAccount {
-    private Firestore firestore;
-    private InputProvider inputProvider;
+@Service
+public class DeleteAccountService {
 
-   public DeleteAccount(InputProvider provider,Firestore firestore){
-       this.inputProvider = provider;
-       this.firestore = firestore;
-   }
+    private static final Logger logger = LoggerFactory.getLogger(DeleteAccountService.class);
+    private final Firestore firestore; // final para evitar la concurrencia y modificacion por accidente
 
-   public boolean deleteAccount(User currentUser){
-       System.out.println("Por favor, ingrese su contraseña para confirmar la eliminación de su cuenta : ");
-       String password = inputProvider.nextLine();
-       System.out.println("Por favor confirme la contraseña");
-       String confirmPassword = inputProvider.nextLine();
-        if(!Create.checkIsNull(password,confirmPassword)) {
-            System.err.println("Tenga en cuenta que, una vez que su cuenta sea eliminada, no podrá acceder a sus notas ni recuperar ningún dato asociado a ella.");
-            System.out.println("Esperando confirmacion y/n");
-            String confirmation = inputProvider.nextLine();
-
-            return checkData(password, confirmPassword, confirmation, currentUser);
-        }else {
-            return false;
-        }
-   }
-
-
-
-   private boolean checkData(String password,String confirmPassword,String confirmation,User currentUser){
-        if(confirmation.equals("y")){
-            if(password.equals(confirmPassword)){
-                return validatePassword(password,currentUser);
-            }else {
-                System.err.println("Las contraseñas no coinciden");
-                return false;
-            }
-        }else {
-            return false;
-        }
-   }
-
-
-
-    private boolean validatePassword(String password,User user){
-        ApiFuture<DocumentSnapshot> future = firestore.collection("users").document(user.getUserName()).get();
-        try{
-            DocumentSnapshot document = future.get();
-            String currentPassword = document.getString("password");
-            if(BCrypt.checkpw(password, currentPassword)){
-                return executeElimination(user);
-            }else {
-                System.err.println("Contraseña incorrecta");
-                return false;
-            }
-        }catch (ExecutionException | InterruptedException e) {
-            System.err.println("Error al obtener documento del usuario: " + e.getMessage());
-        }
-        return false;
+    public DeleteAccountService(Firestore firestore) {
+        this.firestore = firestore;
     }
 
+    public void deleteAccount(User currentUser, String password, String confirmPassword, String confirmation) {
+        logger.info("Solicitud de eliminación de cuenta para usuario: {}", currentUser.getUserName());
 
+        if (!Create.checkIsNull(password, confirmPassword)) {
+            logger.warn("Campos vacios detectados en la solicitud de eliminación");
+            throw new IllegalArgumentException("Por favor digite un campo válido");
+        } else {
+            checkData(password, confirmPassword, confirmation, currentUser);
+        }
+    }
 
-   private boolean executeElimination(User user){
-       try {
+    private void checkData(String password, String confirmPassword, String confirmation, User currentUser) {
+        if (confirmation.equalsIgnoreCase("y")) {
+            logger.info("Confirmación de eliminación recibida para usuario: {}", currentUser.getUserName());
+
+            if (password.equals(confirmPassword)) {
+                validatePassword(password, currentUser);
+            } else {
+                logger.warn("Las contraseñas no coinciden para usuario: {}", currentUser.getUserName());
+                throw new IllegalArgumentException("Las contraseñas no coinciden");
+            }
+        } else {
+            logger.info("El usuario {} canceló la eliminación de la cuenta", currentUser.getUserName());
+        }
+    }
+
+    private void validatePassword(String password, User user) {
+        try {
+            ApiFuture<DocumentSnapshot> future = firestore.collection("users").document(user.getUserName()).get();
+            DocumentSnapshot document = future.get();
+
+            if (!document.exists()) {
+                logger.warn("Usuario {} no encontrado en Firestore", user.getUserName());
+                throw new IllegalArgumentException("Usuario no encontrado");
+            }
+
+            String currentPassword = document.getString("password");
+
+            if (BCrypt.checkpw(password, currentPassword)) {
+                logger.info("Contraseña validada correctamente para usuario: {}", user.getUserName());
+                executeElimination(user);
+            } else {
+                logger.warn("Contraseña incorrecta para usuario: {}", user.getUserName());
+                throw new IllegalArgumentException("Contraseña incorrecta");
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            logger.error("Error al obtener documento del usuario {}: {}", user.getUserName(), e.getMessage());
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el usuario", e);
+        }
+    }
+
+    private void executeElimination(User user) {
+        try {
             DocumentReference document = firestore.collection("users").document(user.getUserName());
+            ApiFuture<WriteResult> future = document.update("isActive", false); // Se marca la cuenta como inactiva
+            future.get();
 
-            ApiFuture<WriteResult> future = document.update("isActive",false); //Se marca la cuenta como inactiva, en lugar de eliminarla
-            future.get();  //Esperar
-
-            System.out.println("Cuenta eliminada exitosamente");
-            return true;
-       } catch (InterruptedException e) {
-           Thread.currentThread().interrupt();
-           System.err.println("La operación fue interrumpida: " + e.getMessage());
-           e.printStackTrace();
-       } catch (ExecutionException e) {
-           System.err.println("Error al eliminar el usuario: " + e.getCause().getMessage());
-           e.printStackTrace();
-       } catch (FirestoreException e) {
-           System.err.println("Error de Firestore al eliminar el usuario: " + e.getMessage());
-           e.printStackTrace();
-       } catch (Exception e) {
-           System.err.println("Error inesperado: " + e.getMessage());
-           e.printStackTrace();
-       }
-       return false;
-   }
+            logger.info("Cuenta de usuario {} marcada como inactiva en Firestore", user.getUserName());
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Error al marcar como inactiva la cuenta del usuario {}: {}", user.getUserName(), e.getMessage());
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar la cuenta", e);
+        }
+    }
 }
