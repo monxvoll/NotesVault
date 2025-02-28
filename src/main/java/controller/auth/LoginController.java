@@ -2,7 +2,6 @@ package controller.auth;
 
 
 import model.authlogic.LoginService;
-import model.entities.User;
 import model.entities.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +17,6 @@ public class LoginController {
         public LoginController(LoginService loginService) {
             this.loginService = loginService;
         }
-
-
 
         @PostMapping("/login")
         public ResponseEntity<?> loginUser(@RequestParam String username, @RequestParam String password){
