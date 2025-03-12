@@ -23,7 +23,7 @@ public class DeleteAccountController {
         this.delete = delete;
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<?> deleteAccount(@RequestParam User user,@RequestParam String password, @RequestParam String confirmPassword, @RequestParam String confirmation) {
 
         logger.info("Solicitud de eliminación de cuenta para usuario: {}", user.getUserName());
