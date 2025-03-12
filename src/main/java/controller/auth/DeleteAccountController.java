@@ -18,7 +18,7 @@ public class DeleteAccountController {
     private static final Logger logger = LoggerFactory.getLogger(DeleteAccountController.class);
     private final DeleteAccountService delete;
 
-    @Autowired
+
     public DeleteAccountController(DeleteAccountService delete) {
         this.delete = delete;
     }
