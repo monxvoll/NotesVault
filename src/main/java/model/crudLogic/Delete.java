@@ -6,8 +6,6 @@ import model.entities.User;
 import util.InputProvider;
 
 import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 
 public class Delete {
 
