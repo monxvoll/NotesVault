@@ -24,30 +24,12 @@ public class User {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public String getPassword() {
         return password;
     }
-
-    public void setPassword(String password) {
-        this.password = hashPassword(password);
-    }
-
-    public List<Note> getNotesList() {
-        return notesList;
-    }
-
-    public void setNotesList(List<Note> noteList) {
-        this.notesList = noteList;
-    }
-
     public String getEmail() {
         return email;
     }
-
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
