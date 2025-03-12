@@ -4,11 +4,9 @@ import com.google.cloud.firestore.*;
 import model.entities.Note;
 import model.entities.User;
 import util.InputProvider;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Scanner;
 
 public class Update {
     private LocalDateTime localDateTime;
@@ -39,7 +37,7 @@ public class Update {
                     System.out.println("Por favor ingrese el nuevo contenido: ");
                     String newContent = inputProvider.nextLine();
 
-                    if(!Create.checkIsNull(newTitle, newContent)) {
+                    if(!CreateService.checkIsNull(newTitle, newContent)) {
                         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
                         String date = localDateTime.format(format);
 
