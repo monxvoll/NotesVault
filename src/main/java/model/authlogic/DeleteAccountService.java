@@ -2,7 +2,7 @@ package model.authlogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import model.crudLogic.Create;
+import model.crudLogic.CreateService;
 import model.entities.User;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class DeleteAccountService {
     public void deleteAccount(User currentUser, String password, String confirmPassword, String confirmation) {
         logger.info("Solicitud de eliminación de cuenta para usuario: {}", currentUser.getUserName());
 
-        if (!Create.checkIsNull(password, confirmPassword)) {
+        if (!CreateService.checkIsNull(password, confirmPassword)) {
             logger.warn("Campos vacios detectados en la solicitud de eliminación");
             throw new IllegalArgumentException("Por favor digite un campo válido");
         } else {
