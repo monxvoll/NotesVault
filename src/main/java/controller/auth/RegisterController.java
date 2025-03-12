@@ -15,8 +15,7 @@ public class RegisterController {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     private final RegisterService registerService;
-
-    @Autowired
+    
     public RegisterController(RegisterService registerService) {
         this.registerService = registerService;
     }
