@@ -26,28 +26,28 @@ public class RegisterService {
     }
 
     public void registerUser(User user) throws Exception {
-        logger.info("Intentando registrar usuario: {}", user.getUserName());
+        logger.info("Intentando registrar : {}", user.getEmail());
 
-        if (existsUserByName(user.getUserName())) {
-            logger.warn("Intento de registro con nombre de usuario ya existente: {}", user.getUserName());
-            throw new IllegalArgumentException("Este nombre de usuario ya existe");
+        if (existsUserByEmail(user.getEmail())) {
+            logger.warn("Intento de registro con email ya existente: {}", user.getEmail());
+            throw new IllegalArgumentException("Este email ya existe");
         }
         if (!validateEmail(user.getEmail())) {
             logger.warn("Intento de registro con correo inválido: {}", user.getEmail());
             throw new IllegalArgumentException("Correo electrónico inválido");
         }
         if (!validatePassword(user.getPassword())) {
-            logger.warn("Intento de registro con contraseña no válida para usuario: {}", user.getUserName());
+            logger.warn("Intento de registro con contraseña no válida para : {}", user.getEmail());
             throw new IllegalArgumentException("Contraseña inválida (8-30 caracteres, una mayúscula, un dígito y un símbolo)");
         }
 
         boolean success = saveUserToFirestore(user);
         if (!success) {
-            logger.error("Fallo al guardar usuario en Firestore: {}", user.getUserName());
+            logger.error("Fallo al guardar usuario en Firestore: {}", user.getEmail());
             throw new Exception("Error al guardar el usuario en Firestore");
         }
 
-        logger.info("Usuario {} registrado exitosamente en Firestore", user.getUserName());
+        logger.info("Usuario {} registrado exitosamente en Firestore", user.getEmail());
     }
 
     private boolean validateEmail(String email) {
@@ -66,14 +66,14 @@ public class RegisterService {
         return validator.validate(new PasswordData(password)).isValid();
     }
 
-    public boolean existsUserByName(String name) {
+    public boolean existsUserByEmail(String email) {
         try {
-            ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = firestore.collection("users").document(name).get();
+            ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = firestore.collection("users").document(email).get();
             boolean exists = future.get().exists();
-            logger.debug("Verificación de usuario en Firestore: {} - Existe: {}", name, exists);
+            logger.debug("Verificación de email en Firestore: {} - Existe: {}", email, exists);
             return exists;
         } catch (InterruptedException | ExecutionException e) {
-            logger.error("Error al verificar el usuario en Firestore: {}", e.getMessage(), e);
+            logger.error("Error al verificar el email en Firestore: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
             return false;
         }
@@ -85,7 +85,7 @@ public class RegisterService {
         userMap.put("userName", user.getUserName());
         userMap.put("password", user.getPassword());
 
-        ApiFuture<WriteResult> future = firestore.collection("users").document(user.getUserName()).set(userMap);
+        ApiFuture<WriteResult> future = firestore.collection("users").document(user.getEmail()).set(userMap);
 
         try {
             WriteResult result = future.get();
