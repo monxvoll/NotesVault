@@ -25,9 +25,10 @@ public class DeleteAccountController {
 
     @DeleteMapping
     public ResponseEntity<?> deleteAccount(@RequestParam User user,@RequestParam String password, @RequestParam String confirmPassword, @RequestParam String confirmation) {
-
-        logger.info("Solicitud de eliminación de cuenta para usuario: {}", user.getUserName());
-
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cuerpo de la solicitud no puede estar vacio");
+        }
+        logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", user.getUserName());
         try {
             delete.deleteAccount(user, password, confirmPassword, confirmation);
             logger.info("Cuenta eliminada correctamente para usuario: {}", user.getUserName());

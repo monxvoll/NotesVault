@@ -15,7 +15,7 @@ public class RegisterController {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     private final RegisterService registerService;
-    
+
     public RegisterController(RegisterService registerService) {
         this.registerService = registerService;
     }
@@ -25,7 +25,7 @@ public class RegisterController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cuerpo de la solicitud no puede estar vacio");
         }
-
+        logger.info("Solicitud de registro recibida para usuario: {}", user.getUserName());
         try {
             registerService.registerUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
