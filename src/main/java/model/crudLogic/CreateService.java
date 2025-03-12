@@ -2,81 +2,75 @@ package model.crudLogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import model.authlogic.LoginService;
 import model.entities.Note;
 import model.entities.User;
-import util.InputProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 
-public class Create {
+public class CreateService {
 
+    private static final Logger logger = LoggerFactory.getLogger(CreateService.class);
     private LocalDateTime localDateTime;
     private String exclusiveId;
-    private InputProvider inputProvider;
-    private Firestore firestore;
+    private final Firestore firestore;
 
-    public Create(InputProvider inputProvider,Firestore firestore){
-        this.inputProvider = inputProvider;
+    public CreateService(Firestore firestore){
         this.localDateTime = LocalDateTime.now();
         this.exclusiveId = UUID.randomUUID().toString(); //Genera un ID unico utilizando UUID y lo convierte a String
         this.firestore = firestore;
     }
 
-    public void createNote(User user){
-        System.out.println("Digite el titulo de la nota");
-        String title = inputProvider.nextLine();
-        System.out.println("Digite el contenido de la nota");
-        String content = inputProvider.nextLine();
-
-        if(!checkIsNull(title, content)) {
+    public String createNote(User user, String title, String content){
+        if(validateNotEmpty(title, content)) {
+            logger.info("Iniciando creación de nota para usuario: {}", user.getEmail());
             DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             String date = localDateTime.format(format);
             Note note = new Note(title, content, date, exclusiveId);
-            addNote(user, note);
+             return addNote(user, note);
         }
+        return "Error en la validación de datos";
     }
 
-    private void addNote(User user, Note note) {
+    private String addNote(User user, Note note) {
         try {
-            // Verificar que el usuario este autenticado y su nombre de usuario no sea nulo
-            if (user != null && user.getUserName() != null && note != null && note.getId() != null) {
-                // Referencia al documento del usuario actual según su nombre de usuario
-                DocumentReference userRef = firestore.collection("users").document(user.getUserName());
-
-                // Referencia a la lista de notas del usuario
-                CollectionReference notesRef = userRef.collection("notesList");
-
-                // Añadir la nueva nota a la lista de notas del usuario
-                ApiFuture<WriteResult> future = notesRef.document(note.getId()).set(note);
-                WriteResult result = future.get();
-
-                System.err.println("Nota guardada exitosamente en Firestore en: " + result.getUpdateTime());
-            } else {
-                System.out.println("Error: Usuario o nota no válidos.");
+            if (user == null || user.getUserName() == null || note == null || note.getId() == null) {
+                logger.warn("Error: Usuario o nota no válidos.");
+                throw new IllegalArgumentException("Error: Usuario o nota no válidos.");
             }
 
+            DocumentReference userRef = firestore.collection("users").document(user.getEmail());
+            CollectionReference notesRef = userRef.collection("notesList");
+
+            ApiFuture<WriteResult> future = notesRef.document(note.getId()).set(note);
+            WriteResult result = future.get();
+
+            logger.info("Nota guardada exitosamente en Firestore en: {}", result.getUpdateTime());
+            return "Nota creada exitosamente";
+
         } catch (InterruptedException e) {
-            System.err.println("Error al guardar la nota (interrupción del hilo): " + e.getMessage());
+            logger.error("Error al guardar la nota (interrupción del hilo): {}", e.getMessage());
             Thread.currentThread().interrupt();
+            return "Error al guardar la nota: interrupción del hilo";
         } catch (ExecutionException e) {
-            System.err.println("Error al guardar la nota en Firestore: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al guardar la nota en Firestore: {}", e.getMessage());
+            return "Error al guardar la nota en Firestore";
         } catch (Exception e) {
-            System.err.println("Error inesperado: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error inesperado: {}", e.getMessage());
+            return "Error inesperado al guardar la nota";
         }
     }
 
-    public static boolean checkIsNull(String title,String content) {
-        if(title.isEmpty() || content.isEmpty()){
-            System.err.println("Por favor digite un campo valido");
-            return true;
+    public static boolean validateNotEmpty(String title, String content) {
+        if (title == null || title.isEmpty() || content == null || content.isEmpty()) {
+            throw new IllegalArgumentException("Por favor, digite un campo válido");
         }
-        return false;
+        return true;
     }
 }
