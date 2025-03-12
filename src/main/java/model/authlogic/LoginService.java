@@ -1,9 +1,9 @@
 package model.authlogic;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
+import model.entities.User;
 import model.entities.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -24,16 +22,16 @@ public class LoginService {
         this.firestore = firestore;
     }
 
-    public UserDTO loginUser(String name , String password) {
-        logger.info("Intento de inicio de sesión para usuario: {}", name);
-        validateInputs(name, password);
-        return compareInfo(name, password);
+    public UserDTO loginUser(User user) {
+        logger.info("Intento de inicio de sesión para usuario: {}", user.getUserName());
+        validateInputs(user.getEmail(),user.getPassword());
+        return compareCredentials(user.getEmail(), user.getPassword());
     }
 
-    public void validateInputs(String name, String password) {
-        if (name == null || name.isEmpty()) {
-            logger.warn("Intento de inicio de sesión con nombre vacío");
-            throw new IllegalArgumentException("El nombre es obligatorio");
+    public void validateInputs(String email, String password) {
+        if (email == null || email.isEmpty()) {
+            logger.warn("Intento de inicio de sesión con email vacío");
+            throw new IllegalArgumentException("El email es obligatorio");
         }
         if (password == null || password.isEmpty()) {
             logger.warn("Intento de inicio de sesión con contraseña vacía");
@@ -41,28 +39,26 @@ public class LoginService {
         }
     }
 
-    private UserDTO compareInfo(String name, String password) {
-        ApiFuture<QuerySnapshot> future = firestore.collection("users")
-                .whereEqualTo("userName", name) // Filtra directamente en Firestore
-                .get();
+    private UserDTO compareCredentials(String email, String password) {
+
         try {
-            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            if (documents.isEmpty()) {
-                logger.warn("Usuario no encontrado: {}", name);
-                throw new IllegalArgumentException("Usuario no encontrado");
+            ApiFuture<DocumentSnapshot> future = firestore.collection("users").document(email).get();
+            DocumentSnapshot document = future.get();
+            if (!document.exists()) {
+                logger.warn("Email no encontrado: {}", email);
+                throw new IllegalArgumentException("Email no encontrado");
             }
 
-            QueryDocumentSnapshot document = documents.get(0);
             String registeredUserPassword = document.getString("password");
 
             if (!BCrypt.checkpw(password, registeredUserPassword)) {
-                logger.warn("Contraseña incorrecta para usuario: {}", name);
+                logger.warn("Contraseña incorrecta para : {}", email);
                 throw new IllegalArgumentException("Contraseña incorrecta");
             }
 
-            String email = document.getString("email");
-            logger.info("Inicio de sesión exitoso para usuario: {}", name);
-            return new UserDTO(email, name);
+            String userName = document.getString("userName");
+            logger.info("Inicio de sesión exitoso para : {}", email);
+            return new UserDTO(email, userName);
 
         } catch (InterruptedException e) {
             logger.error("Error al traer los usuarios desde Firestore: {}", e.getMessage());
