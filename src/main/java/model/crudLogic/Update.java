@@ -37,7 +37,7 @@ public class Update {
                     System.out.println("Por favor ingrese el nuevo contenido: ");
                     String newContent = inputProvider.nextLine();
 
-                    if(!CreateService.checkIsNull(newTitle, newContent)) {
+                    if(CreateService.validateNotEmpty(newTitle, newContent)) {
                         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
                         String date = localDateTime.format(format);
 
