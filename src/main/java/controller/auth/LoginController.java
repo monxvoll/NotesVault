@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/auth")
 public class LoginController {
-
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     private final LoginService loginService;
 
@@ -28,7 +27,7 @@ public class LoginController {
             logger.info("Inicio de sesión exitoso para usuario: {}", loggedUser);
             return ResponseEntity.ok(loggedUser); // Retorna el usuario (solo su nombre y email)
         } catch (ResponseStatusException e) {
-            logger.warn("Error en el inicio de sesión para usuario {}: {}", user.getUserName(), e.getReason());
+            logger.warn("Error en el inicio de sesión para usuario {}:  {}", user.getUserName(), e.getReason());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }

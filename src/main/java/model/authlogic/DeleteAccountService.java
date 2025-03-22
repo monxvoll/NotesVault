@@ -10,12 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class DeleteAccountService {
-
     private static final Logger logger = LoggerFactory.getLogger(DeleteAccountService.class);
     private final Firestore firestore; // final para evitar la concurrencia y modificacion por accidente
 
