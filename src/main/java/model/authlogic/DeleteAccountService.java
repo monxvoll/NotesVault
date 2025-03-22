@@ -28,7 +28,7 @@ public class DeleteAccountService {
 
         if (CreateService.validateNotEmpty(password, confirmPassword)) {
             logger.warn("Campos vacios detectados en la solicitud de eliminación");
-            throw new IllegalArgumentException("Por favor digite un campo válido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Por favor digite un campo válido");
         } else {
             checkData(password, confirmPassword, confirmation, currentUser);
         }
@@ -42,7 +42,7 @@ public class DeleteAccountService {
                 validatePassword(password, currentUser);
             } else {
                 logger.warn("Las contraseñas no coinciden para usuario: {}", currentUser.getEmail());
-                throw new IllegalArgumentException("Las contraseñas no coinciden");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Las contraseñas no coinciden");
             }
         } else {
             logger.info("El usuario {} canceló la eliminación de la cuenta", currentUser.getEmail());
@@ -56,7 +56,8 @@ public class DeleteAccountService {
 
             if (!document.exists()) {
                 logger.warn("Usuario {} no encontrado en Firestore", user.getEmail());
-                throw new IllegalArgumentException("Usuario no encontrado");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+
             }
 
             String currentPassword = document.getString("password");
@@ -66,7 +67,7 @@ public class DeleteAccountService {
                 executeElimination(user);
             } else {
                 logger.warn("Contraseña incorrecta para usuario: {}", user.getEmail());
-                throw new IllegalArgumentException("Contraseña incorrecta");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Contraseña incorrecta");
             }
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error al obtener documento del usuario {}: {}", user.getEmail(), e.getMessage());
@@ -84,7 +85,7 @@ public class DeleteAccountService {
 
             if (!snapshot.exists()) {
                 logger.warn("No se encontró la cuenta del usuario {} en Firestore", user.getEmail());
-                throw new IllegalArgumentException("Usuario no encontrado");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Usuario no encontrado");
             }
 
             ApiFuture<WriteResult> updateFuture = document.update("isActive", false, "deletedAt", FieldValue.serverTimestamp());
