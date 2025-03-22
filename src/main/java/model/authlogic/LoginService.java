@@ -30,7 +30,7 @@ public class LoginService {
 
     public void validateInputs(String email, String password) {
         if (email == null || email.isEmpty()) {
-            logger.warn("Intento de inicio de sesión con email vacío");
+            logger.warn("Intento de inicio de sesión con email vacio");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"El email es obligatorio");
         }
         if (password == null || password.isEmpty()) {

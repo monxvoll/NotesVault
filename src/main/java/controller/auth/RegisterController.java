@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/auth")
 public class RegisterController {
-
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     private final RegisterService registerService;
 
@@ -22,7 +21,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
-        logger.info("Solicitud de registro recibida para usuario: {}", user.getUserName());
+        logger.info("Solicitud de registro recibida para usuario: {} ", user.getUserName());
         try {
             registerService.registerUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");

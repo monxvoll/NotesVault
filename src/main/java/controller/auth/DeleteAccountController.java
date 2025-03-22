@@ -13,10 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController //Le decimos a springboot que esta clase es un controlador, por lo tanto devolvera una respuesta en json
 @RequestMapping("/account") //Definicion Ruta Base del controlador
 public class DeleteAccountController {
-
     private static final Logger logger = LoggerFactory.getLogger(DeleteAccountController.class); //Para registrar eventos
     private final DeleteAccountService delete; //Servicio Injectado
-
 
     public DeleteAccountController(DeleteAccountService delete) {
         this.delete = delete;

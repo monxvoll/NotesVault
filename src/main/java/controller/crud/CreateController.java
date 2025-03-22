@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
 @RequestMapping("/note")
 public class CreateController {
-    //El log llevara el nombre de la clase "CreateController"
     private static final Logger logger = LoggerFactory.getLogger(CreateController.class);
     private final CreateService createService;
 
@@ -22,14 +22,14 @@ public class CreateController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createController(@RequestBody User user, @RequestParam String title, @RequestParam String content){
+    public ResponseEntity<?> createNote(@RequestBody User user, @RequestParam String title, @RequestParam String content){
         logger.info("Solicitud de creacion de nota recibida para usuario: {}", user.getUserName());
         try {
-            String result = createService.createNote(user, title, content);
-            return ResponseEntity.ok(result);
-        }catch (IllegalArgumentException e) {
+            createService.createNote(user, title, content);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
+        }catch (ResponseStatusException e) {
             logger.warn("Error de validación en el registro: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 

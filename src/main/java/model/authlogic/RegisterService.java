@@ -36,7 +36,7 @@ public class RegisterService {
         }
         if (!validateEmail(user.getEmail())) {
             logger.warn("Intento de registro con correo inválido: {}", user.getEmail());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo electrónico inválido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo electrónico invalido");
         }
         if (!validatePassword(user.getPassword())) {
             logger.warn("Intento de registro con contraseña no válida para : {}", user.getEmail());
