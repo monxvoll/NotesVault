@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController //Le decimos a springboot que esta clase es un controlador, por lo tanto devolvera una respuesta en json
@@ -32,10 +32,9 @@ public class DeleteAccountController {
             delete.deleteAccount(user, password, confirmPassword, confirmation);
             logger.info("Cuenta eliminada correctamente para usuario: {}", user.getUserName());
             return ResponseEntity.ok("Cuenta eliminada correctamente");
-        } catch (IllegalArgumentException e) {
+        }catch (ResponseStatusException e) {
             logger.warn("Error de validación en eliminación de cuenta: {}", e.getMessage());
-            //Se devolvera el estado 400 BAD REQUEST, indicando que la solicitud es invalida
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 }
