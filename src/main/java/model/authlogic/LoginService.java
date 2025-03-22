@@ -31,11 +31,11 @@ public class LoginService {
     public void validateInputs(String email, String password) {
         if (email == null || email.isEmpty()) {
             logger.warn("Intento de inicio de sesión con email vacío");
-            throw new IllegalArgumentException("El email es obligatorio");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"El email es obligatorio");
         }
         if (password == null || password.isEmpty()) {
             logger.warn("Intento de inicio de sesión con contraseña vacía");
-            throw new IllegalArgumentException("La contraseña es obligatoria");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La contraseña es obligatoria");
         }
     }
 
@@ -46,14 +46,14 @@ public class LoginService {
             DocumentSnapshot document = future.get();
             if (!document.exists()) {
                 logger.warn("Email no encontrado: {}", email);
-                throw new IllegalArgumentException("Email no encontrado");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Email no encontrado");
             }
 
             String registeredUserPassword = document.getString("password");
 
             if (!BCrypt.checkpw(password, registeredUserPassword)) {
                 logger.warn("Contraseña incorrecta para : {}", email);
-                throw new IllegalArgumentException("Contraseña incorrecta");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Contraseña incorrecta");
             }
 
             String userName = document.getString("userName");
