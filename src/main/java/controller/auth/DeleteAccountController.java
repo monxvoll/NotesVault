@@ -1,10 +1,8 @@
 package controller.auth;
 
 import model.authlogic.DeleteAccountService;
-import model.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,15 +18,12 @@ public class DeleteAccountController {
         this.delete = delete;
     }
 
-    @DeleteMapping //Indicamos que en este caso el metodo responde a solicitudes HTTP delete
-    public ResponseEntity<?> deleteAccount(@RequestParam User user,@RequestParam String password, @RequestParam String confirmPassword, @RequestParam String confirmation) {
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cuerpo de la solicitud no puede estar vacio");
-        }
-        logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", user.getUserName());
+    @DeleteMapping("/deleteAccount")//Indicamos que en este caso el metodo responde a solicitudes HTTP delete
+    public ResponseEntity<String> deleteAccount(@RequestParam String userEmail, @RequestParam String password, @RequestParam String confirmPassword, @RequestParam String confirmation) {
+        logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", userEmail);
         try {
-            delete.deleteAccount(user, password, confirmPassword, confirmation);
-            logger.info("Cuenta eliminada correctamente para usuario: {}", user.getUserName());
+            delete.deleteAccount(userEmail, password, confirmPassword, confirmation);
+            logger.info("Cuenta eliminada correctamente para usuario: {}", userEmail);
             return ResponseEntity.ok("Cuenta eliminada correctamente");
         }catch (ResponseStatusException e) {
             logger.warn("Error de validación en eliminación de cuenta: {}", e.getMessage());

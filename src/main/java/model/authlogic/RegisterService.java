@@ -1,5 +1,6 @@
 package model.authlogic;
 
+import com.google.cloud.firestore.FieldValue;
 import model.entities.User;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.passay.*;
@@ -11,7 +12,6 @@ import com.google.api.core.ApiFuture;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,6 +86,7 @@ public class RegisterService {
         userMap.put("email", user.getEmail());
         userMap.put("userName", user.getUserName());
         userMap.put("password", user.getPassword());
+        userMap.put("createdAt", FieldValue.serverTimestamp()); //Se anexa fecha de creacion
 
         ApiFuture<WriteResult> future = firestore.collection("users").document(user.getEmail()).set(userMap);
 

@@ -1,7 +1,5 @@
 package controller.crud;
 
-
-import model.entities.User;
 import model.crudLogic.CreateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +20,11 @@ public class CreateController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createNote(@RequestBody User user, @RequestParam String title, @RequestParam String content){
-        logger.info("Solicitud de creacion de nota recibida para usuario: {}", user.getUserName());
+    public ResponseEntity<String> createNote(@RequestParam String userEmail, @RequestParam String title, @RequestParam String content){
+        logger.info("Solicitud de creacion de nota recibida para usuario: {}", userEmail);
         try {
-            createService.createNote(user, title, content);
+            createService.createNote(userEmail, title, content);
+            logger.info("Solicitud de creacion de nota exitosa para usuario: {}", userEmail);
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
         }catch (ResponseStatusException e) {
             logger.warn("Error de validación en el registro: {}", e.getMessage());
