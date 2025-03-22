@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.api.core.ApiFuture;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,26 +27,26 @@ public class RegisterService {
         this.firestore = firestore;
     }
 
-    public void registerUser(User user) throws Exception {
+    public void registerUser(User user)  {
         logger.info("Intentando registrar : {}", user.getEmail());
 
         if (existsUserByEmail(user.getEmail())) {
             logger.warn("Intento de registro con email ya existente: {}", user.getEmail());
-            throw new IllegalArgumentException("Este email ya existe");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Este email ya se encuentra registrado");
         }
         if (!validateEmail(user.getEmail())) {
             logger.warn("Intento de registro con correo inválido: {}", user.getEmail());
-            throw new IllegalArgumentException("Correo electrónico inválido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo electrónico inválido");
         }
         if (!validatePassword(user.getPassword())) {
             logger.warn("Intento de registro con contraseña no válida para : {}", user.getEmail());
-            throw new IllegalArgumentException("Contraseña inválida (8-30 caracteres, una mayúscula, un dígito y un símbolo)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Contraseña inválida (8-30 caracteres, una mayúscula, un dígito y un símbolo)");
         }
 
         boolean success = saveUserToFirestore(user);
         if (!success) {
             logger.error("Fallo al guardar usuario en Firestore: {}", user.getEmail());
-            throw new Exception("Error al guardar el usuario en Firestore");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al guardar el usuario en Firestore");
         }
 
         logger.info("Usuario {} registrado exitosamente en Firestore", user.getEmail());
