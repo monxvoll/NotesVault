@@ -42,7 +42,7 @@ public class DeleteAccountService {
                 validatePassword(password, currentUser);
             } else {
                 logger.warn("Las contraseñas no coinciden para usuario: {}", currentUser.getEmail());
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Las contraseñas no coinciden");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Las contraseñas no coinciden");
             }
         } else {
             logger.info("El usuario {} canceló la eliminación de la cuenta", currentUser.getEmail());
