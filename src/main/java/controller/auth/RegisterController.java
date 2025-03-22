@@ -24,6 +24,7 @@ public class RegisterController {
         logger.info("Solicitud de registro recibida para usuario: {} ", user.getUserName());
         try {
             registerService.registerUser(user);
+            logger.info("Registro exitoso para usuario: {}", user.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
         } catch (ResponseStatusException e) {
             logger.error("Error inesperado en el registro", e);

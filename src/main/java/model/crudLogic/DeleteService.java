@@ -1,39 +1,56 @@
 package model.crudLogic;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.concurrent.ExecutionException;
 
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import model.entities.User;
-import util.InputProvider;
+@Service
+public class DeleteService {
+    private static final Logger logger = LoggerFactory.getLogger(DeleteService.class);
+    private final Firestore firestore;
 
-import java.util.List;
+    public DeleteService(Firestore firestore) {
+        this.firestore = firestore;
+    }
 
-public class Delete {
-
-    public void removeNoteByName(User user, InputProvider inputProvider) {
+    public void deleteNote(String userEmail, String noteId) {
         try {
-            if (user == null || user.getUserName() == null) {
-                System.err.println("Error: Usuario no válido.");
-                return;
+            logger.info("Intentando eliminar la nota con ID {} para el usuario {}", noteId, userEmail);
+
+            // Referencia a la nota
+            DocumentReference noteRef = firestore.collection("users").document(userEmail).collection("notesList").document(noteId);
+
+            // Verificamos si la nota existe
+            ApiFuture<DocumentSnapshot> future = noteRef.get();
+            DocumentSnapshot document = future.get();
+
+            if (!document.exists()) {
+                logger.warn("Intento de eliminar una nota inexistente: {}", noteId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La nota no existe");
             }
 
-            List<QueryDocumentSnapshot> documents = Read.getUserNotesCollection(user);
+            // Se marca la nota como inactiva en lugar de eliminarla
+            ApiFuture<WriteResult> updateFuture = noteRef.update(
+                    "isActive", false,
+                    "deletedAt", FieldValue.serverTimestamp()
+            );
+            updateFuture.get();
 
-                if (documents == null) {
-                    System.err.println("Error al traer las notas del usuario");
-                } else {
-                    if (Read.hasNotes(documents)) {
-                        Read.enumerateNotes(documents);
+            logger.info("Nota con ID {} marcada como inactiva correctamente.", noteId);
 
-                        int noteIndex = Read.getNoteIndex(inputProvider, documents);
-                        if (noteIndex == -1) return;
+        } catch (InterruptedException e) {
+            logger.error("Error al marcar como inactiva la nota (interrupción del hilo): {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar la nota", e);
 
-                        documents.get(noteIndex).getReference().delete();
-                        System.err.println("Nota borrada exitosamente");
-                    }
-                }
-        } catch (Exception e) {
-            System.err.println("Error inesperado: " + e.getMessage());
-            e.printStackTrace();
+        } catch (ExecutionException e) {
+            logger.error("Error en la base de datos al eliminar la nota: {}", e.getCause().getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en la base de datos", e);
         }
     }
 }

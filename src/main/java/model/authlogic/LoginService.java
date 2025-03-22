@@ -4,7 +4,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import model.entities.User;
-import model.entities.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,10 @@ public class LoginService {
         this.firestore = firestore;
     }
 
-    public UserDTO loginUser(User user) {
+    public void loginUser(User user) {
         logger.info("Intento de inicio de sesión para usuario: {}", user.getUserName());
         validateInputs(user.getEmail(),user.getPassword());
-        return compareCredentials(user.getEmail(), user.getPassword());
+        compareCredentials(user.getEmail(), user.getPassword());
     }
 
     public void validateInputs(String email, String password) {
@@ -39,7 +38,7 @@ public class LoginService {
         }
     }
 
-    private UserDTO compareCredentials(String email, String password) {
+    private void compareCredentials(String email, String password) {
 
         try {
             ApiFuture<DocumentSnapshot> future = firestore.collection("users").document(email).get();
@@ -56,9 +55,7 @@ public class LoginService {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Contraseña incorrecta");
             }
 
-            String userName = document.getString("userName");
             logger.info("Inicio de sesión exitoso para : {}", email);
-            return new UserDTO(email, userName);
 
         } catch (InterruptedException e) {
             logger.error("Error al traer los usuarios desde Firestore: {}", e.getMessage());
