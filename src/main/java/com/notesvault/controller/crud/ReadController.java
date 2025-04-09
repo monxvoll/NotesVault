@@ -1,7 +1,6 @@
 package com.notesvault.controller.crud;
 
 import com.notesvault.model.entities.User;
-import com.notesvault.model.crudLogic.Read;
 
 public class ReadController {
     private Read read;
