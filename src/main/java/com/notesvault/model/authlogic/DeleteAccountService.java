@@ -1,6 +1,5 @@
-package model.authlogic;
+package com.notesvault.model.authlogic;
 
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;

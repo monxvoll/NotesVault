@@ -1,4 +1,4 @@
-package model.crudLogic;
+package com.notesvault.model.crudLogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;

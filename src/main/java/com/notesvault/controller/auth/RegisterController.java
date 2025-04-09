@@ -1,7 +1,7 @@
-package controller.auth;
+package com.notesvault.controller.auth;
 
-import model.authlogic.RegisterService;
-import model.entities.User;
+import com.notesvault.model.authlogic.RegisterService;
+import com.notesvault.model.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
-package controller.crud;
+package com.notesvault.controller.crud;
 
-import model.entities.User;
-import model.crudLogic.Read;
+import com.notesvault.model.entities.User;
+import com.notesvault.model.crudLogic.Read;
 
 public class ReadController {
     private Read read;

@@ -1,4 +1,4 @@
-package util;
+package com.notesvault.util;
 
 import java.util.Scanner;
 

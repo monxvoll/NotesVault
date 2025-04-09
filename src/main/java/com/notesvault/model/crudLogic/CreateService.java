@@ -1,8 +1,8 @@
-package model.crudLogic;
+package com.notesvault.model.crudLogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import model.entities.Note;
+import com.notesvault.model.entities.Note;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

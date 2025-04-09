@@ -1,11 +1,11 @@
-package model.crudLogic;
+package com.notesvault.model.crudLogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import model.entities.Note;
-import model.entities.User;
-import util.FirestoreInitializer;
-import util.InputProvider;
+import com.notesvault.model.entities.Note;
+import com.notesvault.model.entities.User;
+import com.notesvault.util.FirestoreInitializer;
+import com.notesvault.util.InputProvider;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

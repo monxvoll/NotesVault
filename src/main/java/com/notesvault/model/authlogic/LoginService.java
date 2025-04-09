@@ -1,9 +1,9 @@
-package model.authlogic;
+package com.notesvault.model.authlogic;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import model.entities.User;
+import com.notesvault.model.entities.User;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

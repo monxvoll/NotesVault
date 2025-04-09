@@ -1,4 +1,4 @@
-package model.entities;
+package com.notesvault.model.entities;
 
 
 public class Note {

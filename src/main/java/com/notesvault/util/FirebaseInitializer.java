@@ -1,4 +1,4 @@
-package util;
+package com.notesvault.util;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;

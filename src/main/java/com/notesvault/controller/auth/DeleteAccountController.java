@@ -1,6 +1,6 @@
-package controller.auth;
+package com.notesvault.controller.auth;
 
-import model.authlogic.DeleteAccountService;
+import com.notesvault.model.authlogic.DeleteAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

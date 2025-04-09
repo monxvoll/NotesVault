@@ -1,7 +1,7 @@
-package model.authlogic;
+package com.notesvault.model.authlogic;
 
 import com.google.cloud.firestore.FieldValue;
-import model.entities.User;
+import com.notesvault.model.entities.User;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.passay.*;
 import org.slf4j.Logger;

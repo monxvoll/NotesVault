@@ -1,4 +1,4 @@
-package util;
+package com.notesvault.util;
 
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.cloud.firestore.Firestore;
