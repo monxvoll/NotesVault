@@ -35,4 +35,8 @@ public class User {
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
+
+    public void setPassword(String password) {
+        this.password =  hashPassword(password);
+    }
 }
