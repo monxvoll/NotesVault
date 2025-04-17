@@ -1,6 +1,7 @@
 package com.notesvault.model.authlogic;
 
 import com.google.cloud.firestore.FieldValue;
+import com.notesvault.dtos.RegisterRequest;
 import com.notesvault.model.entities.User;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.passay.*;
@@ -27,22 +28,26 @@ public class RegisterService {
         this.firestore = firestore;
     }
 
-    public void registerUser(User user)  {
-        logger.info("Intentando registrar : {}", user.getEmail());
+    public void registerUser(RegisterRequest request)  {
+        logger.info("Intentando registrar : {}", request.getEmail());
+        String email = request.getEmail();
+        String password = request.getPassword();
 
-        if (existsUserByEmail(user.getEmail())) {
-            logger.warn("Intento de registro con email ya existente: {}", user.getEmail());
+        if (existsUserByEmail(email)) {
+            logger.warn("Intento de registro con email ya existente: {}", email);
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Este email ya se encuentra registrado");
         }
-        if (!validateEmail(user.getEmail())) {
-            logger.warn("Intento de registro con correo inválido: {}", user.getEmail());
+        if (!validateEmail(email)) {
+            logger.warn("Intento de registro con correo inválido: {}", email);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo electrónico invalido");
         }
-        if (!validatePassword(user.getPassword())) {
-            logger.warn("Intento de registro con contraseña no válida para : {}", user.getEmail());
+
+        if (!validatePassword(password)) {
+            logger.warn("Intento de registro con contraseña no válida para : {}", password);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Contraseña inválida (8-30 caracteres, una mayúscula, un dígito y un símbolo)");
         }
-
+        //Se hashea la contraseña despues de hacer la validación
+        User user = new User(request.getEmail(), request.getUserName(), password);
         boolean success = saveUserToFirestore(user);
         if (!success) {
             logger.error("Fallo al guardar usuario en Firestore: {}", user.getEmail());
@@ -82,11 +87,13 @@ public class RegisterService {
     }
 
     public boolean saveUserToFirestore(User user) {
+
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("email", user.getEmail());
         userMap.put("userName", user.getUserName());
         userMap.put("password", user.getPassword());
         userMap.put("createdAt", FieldValue.serverTimestamp()); //Se anexa fecha de creacion
+
 
         ApiFuture<WriteResult> future = firestore.collection("users").document(user.getEmail()).set(userMap);
 

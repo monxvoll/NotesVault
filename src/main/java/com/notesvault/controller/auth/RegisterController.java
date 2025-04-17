@@ -1,5 +1,6 @@
 package com.notesvault.controller.auth;
 
+import com.notesvault.dtos.RegisterRequest;
 import com.notesvault.model.authlogic.RegisterService;
 import com.notesvault.model.entities.User;
 import org.slf4j.Logger;
@@ -20,11 +21,11 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
-        logger.info("Solicitud de registro recibida para usuario: {} ", user.getUserName());
+    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest request) {
+        logger.info("Solicitud de registro recibida para usuario: {} ", request.getUserName());
         try {
-            registerService.registerUser(user);
-            logger.info("Registro exitoso para usuario: {}", user.getEmail());
+            registerService.registerUser(request);
+            logger.info("Registro exitoso para usuario: {}",request.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
         } catch (ResponseStatusException e) {
             logger.error("Error inesperado en el registro", e);
