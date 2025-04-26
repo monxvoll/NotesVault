@@ -50,6 +50,10 @@ public class LoginService {
 
             String registeredUserPassword = document.getString("password");
 
+            Boolean isActive = document.getBoolean("isActive");
+            if (isActive == null || !isActive) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La cuenta se encuentra desactivada");
+            }
 
             if (!BCrypt.checkpw(password, registeredUserPassword)) {
                 logger.warn("Contraseña incorrecta para : {}", email);
