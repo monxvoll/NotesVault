@@ -1,7 +1,7 @@
 package com.notesvault.controller.auth;
 
+import com.notesvault.dtos.RegisterRequest;
 import com.notesvault.model.authlogic.LoginService;
-import com.notesvault.model.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,14 +20,14 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        logger.info("Solicitud de inicio de sesión recibida para usuario: {}", user.getUserName());
+    public ResponseEntity<String> loginUser(@RequestBody RegisterRequest request) {
+        logger.info("Solicitud de inicio de sesión recibida para usuario: {}", request.getEmail());
         try {
-            loginService.loginUser(user);
-            logger.info("Inicio de sesión exitoso para usuario: {}", user.getEmail());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
+            loginService.loginUser(request);
+            logger.info("Inicio de sesión exitoso para usuario: {}", request.getEmail());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Inicio de sesión exitoso");
         } catch (ResponseStatusException e) {
-            logger.warn("Error en el inicio de sesión para usuario {}:  {}", user.getUserName(), e.getReason());
+            logger.warn("Error en el inicio de sesión para usuario {}:  {}", request.getEmail(), e.getReason());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }

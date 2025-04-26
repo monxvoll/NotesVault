@@ -1,7 +1,7 @@
 package com.notesvault.dtos;
 
 public class RegisterRequest {
-    //Dto para manejar verificaciones antes del guardado en firestore
+    //Dto para manejar verificaciones antes de interactuar con la base de datos
     private String email;
     private String userName;
     private String password;

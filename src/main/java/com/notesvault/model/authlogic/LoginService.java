@@ -3,7 +3,7 @@ package com.notesvault.model.authlogic;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.notesvault.model.entities.User;
+import com.notesvault.dtos.RegisterRequest;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,10 @@ public class LoginService {
         this.firestore = firestore;
     }
 
-    public void loginUser(User user) {
-        logger.info("Intento de inicio de sesión para usuario: {}", user.getUserName());
-        validateInputs(user.getEmail(),user.getPassword());
-        compareCredentials(user.getEmail(), user.getPassword());
+    public void loginUser(RegisterRequest request) {
+        logger.info("Intento de inicio de sesión para usuario: {}", request.getEmail());
+        validateInputs(request.getEmail(),request.getPassword());
+        compareCredentials(request.getEmail(),request.getPassword());
     }
 
     public void validateInputs(String email, String password) {
@@ -49,6 +49,7 @@ public class LoginService {
             }
 
             String registeredUserPassword = document.getString("password");
+
 
             if (!BCrypt.checkpw(password, registeredUserPassword)) {
                 logger.warn("Contraseña incorrecta para : {}", email);
