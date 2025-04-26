@@ -92,6 +92,7 @@ public class RegisterService {
         userMap.put("email", user.getEmail());
         userMap.put("userName", user.getUserName());
         userMap.put("password", user.getPassword());
+        userMap.put("isActive", true);
         userMap.put("createdAt", FieldValue.serverTimestamp()); //Se anexa fecha de creacion
 
 
