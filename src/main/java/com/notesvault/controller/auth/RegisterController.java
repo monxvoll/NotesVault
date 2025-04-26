@@ -2,7 +2,6 @@ package com.notesvault.controller.auth;
 
 import com.notesvault.dtos.RegisterRequest;
 import com.notesvault.model.authlogic.RegisterService;
-import com.notesvault.model.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,5 @@ public class RegisterController {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
-
-
 
 }
