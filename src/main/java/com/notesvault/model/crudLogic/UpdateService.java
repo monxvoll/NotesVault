@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +32,9 @@ public class UpdateService {
 
             if(noteDTO.getContent()!=null) updates.put("content",noteDTO.getContent());
 
-            updates.put("date", LocalDateTime.now().toString());
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            updates.put("date", now.format(formatter));
 
             DocumentReference noteRef = firestore.collection("users").document(userEmail).collection("notesList").document(noteId);
 
