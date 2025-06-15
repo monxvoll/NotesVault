@@ -19,10 +19,10 @@ public class UpdateController {
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<?> UpdateNote(@PathVariable String id, @RequestBody NoteDTO noteDTO){
+    public ResponseEntity<?> UpdateNote(@PathVariable String noteId, @RequestBody NoteDTO noteDTO){
         try{
-            logger.info("Solicitud de actualizacion en la nota con id {} para el usuario {}", id, noteDTO.getUserEmail());
-            updateService.updateNote(id,noteDTO);
+            logger.info("Solicitud de actualizacion en la nota con id {} para el usuario {}", noteId, noteDTO.getUserEmail());
+            updateService.updateNote(noteId,noteDTO);
             return ResponseEntity.ok("Nota Actualizada Correctamente");
         }catch (ResponseStatusException e){
             logger.error("Error en la actualizacion de la nota: {}", e.getMessage());
