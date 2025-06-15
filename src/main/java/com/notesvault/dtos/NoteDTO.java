@@ -6,7 +6,7 @@ public class NoteDTO {
     private String userEmail;
     private String title;
     private String content;
-    private LocalDateTime date;
+
 
     public String getUserEmail() {
         return userEmail;
@@ -31,12 +31,5 @@ public class NoteDTO {
     public void setContent(String content) {
         this.content = content;
     }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
+    
 }
