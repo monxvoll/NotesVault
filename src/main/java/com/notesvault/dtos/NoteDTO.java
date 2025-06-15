@@ -1,18 +1,8 @@
 package com.notesvault.dtos;
 
 public class NoteDTO {
-    private String userEmail;
     private String title;
     private String content;
-
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
 
     public String getTitle() {
         return title;
