@@ -31,7 +31,7 @@ public class UpdateService {
 
             if(noteDTO.getContent()!=null) updates.put("content",noteDTO.getContent());
 
-            updates.put("date", LocalDateTime.now());
+            updates.put("date", LocalDateTime.now().toString());
 
             DocumentReference noteRef = firestore.collection("users").document(userEmail).collection("notesList").document(noteId);
 
