@@ -18,7 +18,7 @@ public class UpdateController {
         this.updateService = updateService;
     }
 
-    @PatchMapping("/update/{id}")
+    @PatchMapping("/update/{noteId}")
     public ResponseEntity<?> UpdateNote(@PathVariable String noteId, @RequestBody NoteDTO noteDTO, @RequestParam String userEmail){
         try{
             logger.info("Solicitud de actualizacion en la nota con id {} para el usuario {}", noteId, userEmail);
