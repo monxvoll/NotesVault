@@ -1,7 +1,5 @@
 package com.notesvault.dtos;
 
-import java.time.LocalDateTime;
-
 public class NoteDTO {
     private String userEmail;
     private String title;
@@ -31,5 +29,5 @@ public class NoteDTO {
     public void setContent(String content) {
         this.content = content;
     }
-    
+
 }
