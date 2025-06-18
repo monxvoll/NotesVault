@@ -36,7 +36,7 @@ public class DeleteService {
 
             // Se marca la nota como inactiva en lugar de eliminarla
             ApiFuture<WriteResult> updateFuture = noteRef.update(
-                    "isActive", false,
+                    "active", false,
                     "deletedAt", FieldValue.serverTimestamp()
             );
             updateFuture.get();

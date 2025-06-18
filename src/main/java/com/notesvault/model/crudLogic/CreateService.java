@@ -28,10 +28,10 @@ public class CreateService {
 
             LocalDateTime localDateTime = LocalDateTime.now();
             String exclusiveId = UUID.randomUUID().toString();   //Genera un ID unico utilizando UUID y lo convierte a String
-
+            boolean isActive = true;
             DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             String date = localDateTime.format(format);
-            Note note = new Note(title, content, date, exclusiveId);
+            Note note = new Note(title, content, date, exclusiveId,isActive);
             addNote(userEmail, note);
         }
     }

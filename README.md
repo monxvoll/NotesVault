@@ -1,11 +1,11 @@
-//Version Preeliminar
+//Preliminary Version
+
 # NotesVault
 
-NotesVault es una aplicación en la nube para gestionar notas. Permitiendo a los usuarios crear, leer, editar y eliminar notas fácilmente y de manera segura.
+NotesVault is a cloud-based application for managing notes, allowing users to easily and securely create, read, update, and delete their notes.
 
-## Requisitos
+## Requirements
 
-- JDK 8 o superior
-- Clave de Firebase ( Se obtiene configurando un proyecto en firestore)
-- Gradle o Maven 
-
+- JDK 8 or higher  
+- Firebase key (obtained by setting up a project in Firestore)  
+- Gradle or Maven
