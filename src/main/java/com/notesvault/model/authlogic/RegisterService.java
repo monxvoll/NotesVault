@@ -23,13 +23,17 @@ public class RegisterService {
     //Logger para rastrear eventos y errores en la clase actual
     private static final Logger logger = LoggerFactory.getLogger(RegisterService.class);
     private final Firestore firestore;
+    private final ConfirmationEmailService confirmationEmailService;
+    private final TokenService tokenService;
 
-    public RegisterService(Firestore firestore) {
+    public RegisterService(Firestore firestore, ConfirmationEmailService confirmationEmailService, TokenService tokenService) {
         this.firestore = firestore;
+        this.confirmationEmailService = confirmationEmailService;
+        this.tokenService = tokenService;
     }
 
     public void registerUser(RegisterRequest request)  {
-        logger.info("Intentando registrar : {}", request.getEmail());
+        logger.info("Intentando registrar usuario: {} ({})", request.getUserName(), request.getEmail());
         String email = request.getEmail();
         String password = request.getPassword();
 
@@ -43,9 +47,10 @@ public class RegisterService {
         }
 
         if (!validatePassword(password)) {
-            logger.warn("Intento de registro con contraseña no válida para : {}", password);
+            logger.warn("Intento de registro con contraseña no válida para usuario: {}", email);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Contraseña inválida (8-30 caracteres, una mayúscula, un dígito y un símbolo)");
         }
+        
         //Se hashea la contraseña despues de hacer la validación
         User user = new User(request.getEmail(), request.getUserName(), password);
         boolean success = saveUserToFirestore(user);
@@ -53,7 +58,18 @@ public class RegisterService {
             logger.error("Fallo al guardar usuario en Firestore: {}", user.getEmail());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al guardar el usuario en Firestore");
         }
-
+        
+        // Generar token de confirmación
+        TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(user.getEmail(), "confirmation");
+        logger.info("Token de confirmación generado para usuario: {}", user.getEmail());
+        
+        // Enviar correo de confirmación de forma asíncrona (no bloquea la respuesta)
+        confirmationEmailService.sendConfirmationEmailAsync(user.getEmail(), tokenInfo.getRawToken(), user.getUserName())
+            .exceptionally(throwable -> {
+                logger.error("Error al enviar correo de confirmación a {}: {}", user.getEmail(), throwable.getMessage());
+                return null;
+            });
+            
         logger.info("Usuario {} registrado exitosamente en Firestore", user.getEmail());
     }
 
@@ -93,6 +109,7 @@ public class RegisterService {
         userMap.put("userName", user.getUserName());
         userMap.put("password", user.getPassword());
         userMap.put("isActive", true);
+        userMap.put("isConfirmed", false);
         userMap.put("createdAt", FieldValue.serverTimestamp()); //Se anexa fecha de creacion
 
 
