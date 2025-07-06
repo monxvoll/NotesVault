@@ -1,32 +1,33 @@
 package com.notesvault.model.authlogic;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.notesvault.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 @Service
 public class PasswordRecoveryService {
     private final Logger log = LoggerFactory.getLogger(PasswordRecoveryService.class);
     private final Firestore firestore;
-    private final TokenGeneratorService tokenGeneratorService;
-    private final EmailService emailService;
+    private final EmailRecoveryService emailService;
+    private final Executor cleanupTaskExecutor;
+    private final TokenService tokenService;
 
-    public PasswordRecoveryService(Firestore firestore, TokenGeneratorService tokenGenerator, EmailService emailService) {
+    public PasswordRecoveryService(Firestore firestore, EmailRecoveryService emailService, 
+                                 @org.springframework.beans.factory.annotation.Qualifier("cleanupTaskExecutor") Executor cleanupTaskExecutor, 
+                                 TokenService tokenService) {
         this.firestore = firestore;
-        this.tokenGeneratorService = tokenGenerator;
         this.emailService = emailService;
+        this.tokenService = tokenService;
+        this.cleanupTaskExecutor = cleanupTaskExecutor;
     }
 
     public void generateRecoveryToken (String email) throws UserNotFoundException {
@@ -56,22 +57,19 @@ public class PasswordRecoveryService {
             log.info("Generando token de recuperación para: {}", email);
 
             // Generar token único
-            TokenGeneratorService.GeneratedTokenInfo tokenInfo = tokenGeneratorService.generateSecureToken(email);
+            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(email, "recovery");
             log.info("Token generado y almacenado para {}. Token crudo inicia con: {}", email,
                     tokenInfo.getRawToken().substring(0, Math.min(tokenInfo.getRawToken().length(), 8)) + "...");
 
             // Obtener el nombre del usuario si está disponible
-            String userName = document.getString("name");
+            String userName = document.getString("userName");
             
-            // Enviar correo de recuperación
-            try {
-                emailService.sendPasswordRecoveryEmail(email, tokenInfo.getRawToken(), userName);
-                log.info("Correo de recuperación enviado exitosamente a: {}", email);
-            } catch (Exception e) {
-                log.error("Error al enviar correo de recuperación a {}: {}", email, e.getMessage());
-                // No lanzamos excepción aquí para no revelar información sobre la existencia del usuario
-                // En un entorno de producción, podrías querer manejar esto de manera diferente
-            }
+            // Enviar correo de recuperación de forma asíncrona (no bloquea la respuesta)
+            emailService.sendPasswordRecoveryEmailAsync(email, tokenInfo.getRawToken(), userName)
+                .exceptionally(throwable -> {
+                    log.error("Error al enviar correo de recuperación a {}: {}", email, throwable.getMessage());
+                    return null;
+                });
 
         }catch (InterruptedException e) {
             log.error("Error al verificar usuario en Firestore: {}", e.getMessage());
@@ -96,48 +94,7 @@ public class PasswordRecoveryService {
         }
 
         try {
-            // Buscar tokens activos para el email
-            ApiFuture<QuerySnapshot> future = firestore.collection("activeTokens")
-                .whereEqualTo("userEmail", email)
-                .get();
-            
-            QuerySnapshot querySnapshot = future.get();
-            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-
-            if (documents.isEmpty()) {
-                log.warn("No se encontraron tokens activos para el email: {}", email);
-                return false;
-            }
-
-            // Verificar cada token encontrado
-            for (QueryDocumentSnapshot document : documents) {
-                String storedHashedToken = document.getString("hashedToken");
-                
-                // Verificar que el token proporcionado coincida con el hash almacenado
-                if (BCrypt.checkpw(token, storedHashedToken)) {
-                    // Verificar que el token no haya expirado
-                    Timestamp expirationTimestamp = document.getTimestamp("expirationTime");
-                    if (expirationTimestamp == null) {
-                        log.warn("Token sin timestamp de expiración para usuario: {}", email);
-                        return false;
-                    }
-                    
-                    Instant expirationTime = expirationTimestamp.toDate().toInstant();
-                    if (Instant.now().isAfter(expirationTime)) {
-                        log.warn("Token expirado para usuario: {}", email);
-                        // Eliminar token expirado
-                        firestore.collection("activeTokens").document(document.getId()).delete();
-                        return false;
-                    }
-
-                    log.info("Token verificado exitosamente para usuario: {}", email);
-                    return true;
-                }
-            }
-
-            log.warn("Token no válido para el email: {}", email);
-            return false;
-
+            return tokenService.verifyToken(token, email, "recovery");
         } catch (Exception e) {
             log.error("Error al verificar token: {}", e.getMessage());
             return false;
@@ -152,8 +109,11 @@ public class PasswordRecoveryService {
      * @return true si se cambió exitosamente, false en caso contrario
      */
     public boolean changePasswordWithToken(String token, String email, String newPassword) {
-        if (!verifyRecoveryToken(token, email)) {
-            log.warn("Token inválido para cambio de contraseña: {}", email);
+        log.info("Iniciando cambio de contraseña para usuario: {}", email);
+        
+        // Verificar y consumir el token (lo elimina automáticamente si es válido)
+        if (!tokenService.verifyAndConsumeToken(token, email, "recovery")) {
+            log.warn("Token inválido o ya consumido para cambio de contraseña: {}", email);
             return false;
         }
 
@@ -167,15 +127,19 @@ public class PasswordRecoveryService {
             
             future.get(); // Esperar a que se complete la actualización
 
-            // Eliminar todos los tokens activos para este usuario
-            ApiFuture<QuerySnapshot> tokensFuture = firestore.collection("activeTokens")
-                .whereEqualTo("userEmail", email)
-                .get();
-            
-            QuerySnapshot tokensSnapshot = tokensFuture.get();
-            for (QueryDocumentSnapshot document : tokensSnapshot.getDocuments()) {
-                firestore.collection("activeTokens").document(document.getId()).delete();
-            }
+            // Eliminar cualquier token adicional que pueda existir para este usuario de forma asíncrona
+            CompletableFuture.runAsync(() -> {
+                try {
+                    boolean deleted = tokenService.deleteAllTokensForUser(email, "recovery");
+                    if (deleted) {
+                        log.info("Tokens adicionales eliminados para usuario: {}", email);
+                    } else {
+                        log.debug("No se encontraron tokens adicionales para eliminar para usuario: {}", email);
+                    }
+                } catch (Exception e) {
+                    log.error("Error al eliminar tokens adicionales para usuario {}: {}", email, e.getMessage());
+                }
+            }, cleanupTaskExecutor);
 
             log.info("Contraseña cambiada exitosamente para usuario: {}", email);
             return true;
