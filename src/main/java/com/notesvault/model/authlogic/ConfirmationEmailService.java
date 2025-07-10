@@ -61,7 +61,7 @@ public class ConfirmationEmailService {
 
     public String buildConfirmationEmailContent(String email, String token, String userName){
         String greeting = userName != null ? "Hola " + userName : "Hola";
-        String confirmationUrl = baseUrl + "/confirm?token=" + token + "&email=" + email;
+        String confirmationUrl = baseUrl + "confirm?token=" + token + "&email=" + email;
         return String.format("""
             %s,
 
