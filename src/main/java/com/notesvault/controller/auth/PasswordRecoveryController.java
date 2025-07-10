@@ -67,6 +67,8 @@ public class PasswordRecoveryController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequestDTO requestDTO) {
         try {
+            log.info("Solicitud de cambio de contraseña para usuario: {}", requestDTO.getEmail());
+            
             boolean success = passwordRecoveryService.changePasswordWithToken(
                 requestDTO.getToken(), 
                 requestDTO.getEmail(), 
@@ -74,13 +76,15 @@ public class PasswordRecoveryController {
             );
             
             if (success) {
+                log.info("Contraseña cambiada exitosamente para usuario: {}", requestDTO.getEmail());
                 return ResponseEntity.ok().body("Contraseña cambiada exitosamente");
             } else {
+                log.warn("No se pudo cambiar la contraseña para usuario: {}", requestDTO.getEmail());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo cambiar la contraseña. Verifica el token.");
             }
             
         } catch (Exception e) {
-            log.error("Error al cambiar contraseña", e);
+            log.error("Error al cambiar contraseña para usuario {}: {}", requestDTO.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al cambiar la contraseña");
         }
