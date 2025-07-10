@@ -31,7 +31,7 @@ public class RegisterController {
         try {
             registerService.registerUser(request);
             logger.info("Registro exitoso para usuario: {} ({})", request.getUserName(), request.getEmail());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso. Se ha enviado un correo de confirmación.");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Se ha enviado un correo de confirmación.");
         } catch (ResponseStatusException e) {
             logger.error("Error en el registro para usuario {}: {} - {}", request.getEmail(), e.getStatusCode(), e.getReason());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
