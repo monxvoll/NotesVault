@@ -48,7 +48,7 @@ public class RegisterService {
 
         if (!validatePassword(password)) {
             logger.warn("Intento de registro con contraseña no válida para usuario: {}", email);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Contraseña inválida (8-30 caracteres, una mayúscula, un dígito,sin espacios y un símbolo)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Contraseña inválida (8-30 caracteres, sin espacios, una mayúscula, un dígito y un símbolo)");
         }
         
         //Se hashea la contraseña despues de hacer la validación
