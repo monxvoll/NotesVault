@@ -1,6 +1,7 @@
 package com.notesvault.model.authlogic;
 
 import com.google.cloud.firestore.*;
+import org.apache.el.parser.Token;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,36 +14,36 @@ import java.util.concurrent.ExecutionException;
 public class DeleteAccountService {
     private static final Logger logger = LoggerFactory.getLogger(DeleteAccountService.class);
     private final Firestore firestore;
+    private final TokenService tokenService;
+    private final AccountDeletionEmailService  accountDeletionEmailService;
 
-    public DeleteAccountService(Firestore firestore) {
+    public DeleteAccountService(Firestore firestore, TokenService tokenService, AccountDeletionEmailService accountDeletionEmailService) {
         this.firestore = firestore;
+        this.tokenService = tokenService;
+        this.accountDeletionEmailService = accountDeletionEmailService;
     }
 
-    public void deleteAccount(String userEmail, String password, String confirmPassword, String confirmation) {
-        logger.info("Solicitud de eliminación de cuenta para usuario: {}", userEmail);
+    public void deleteAccount(String userName, String email, String password, String confirmPassword) {
+        logger.info("Solicitud de eliminación de cuenta para usuario: {}", email);
 
         if (isEmpty(password) || isEmpty(confirmPassword)) {
             logger.warn("Campos vacíos detectados en la solicitud de eliminación");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los campos de contraseña no pueden estar vacíos");
         }
 
-        if (!confirmation.equalsIgnoreCase("y")) {
-            logger.info("El usuario {} canceló la eliminación de la cuenta", userEmail);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Eliminación de cuenta cancelada por el usuario");
-        }
-
         if (!password.equals(confirmPassword)) {
-            logger.warn("Las contraseñas no coinciden para usuario: {}", userEmail);
+            logger.warn("Las contraseñas no coinciden para usuario: {}", email);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
         }
 
-        validatePasswordAndDeactivateAccount(password, userEmail);
+        validatePasswordAndSendDeletionEmail(userName,password, email);
     }
 
-    private void validatePasswordAndDeactivateAccount(String password, String userEmail) {
+    private void validatePasswordAndSendDeletionEmail(String userName, String password, String userEmail) {
         try {
             DocumentReference document = firestore.collection("users").document(userEmail);
             DocumentSnapshot snapshot = document.get().get();
+
 
             if (!snapshot.exists()) {
                 logger.warn("Usuario {} no encontrado en Firestore", userEmail);
@@ -55,9 +56,18 @@ public class DeleteAccountService {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta");
             }
 
-            // Se marca el usuario como inactivo y se guarda el timestamp de eliminación
-            document.update("isActive", false, "deletedAt", FieldValue.serverTimestamp()).get();
-            logger.info("Cuenta de usuario {} marcada como inactiva en Firestore", userEmail);
+            // Generar token de confirmación para la eliminación
+            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(userEmail,"confirmation");
+            logger.info("Token de confirmación generado para usuario: {}",userEmail);
+
+            // Enviar correo de eliminación de forma asíncrona
+            accountDeletionEmailService.sendAccountDeletionAsync(userEmail, tokenInfo.getRawToken(),userName)
+                .exceptionally(throwable -> {
+                    logger.error("Error al enviar correo de eliminación a {}: {}",userEmail,throwable.getMessage());
+                    return null;
+                });
+
+            logger.info("Corre de eliminación enviado exitosamente a :  {} ",userEmail);
 
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error al procesar la eliminación de cuenta para usuario {}: {}", userEmail, e.getMessage());
