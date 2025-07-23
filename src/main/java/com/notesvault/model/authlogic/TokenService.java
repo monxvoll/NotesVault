@@ -146,7 +146,7 @@ public class TokenService {
      * @param type Tipo de token (confirmation, recovery)
      * @return true si el token es válido y fue consumido, false en caso contrario
      */
-    public boolean verifyAndConsumeToken(String token, String email, String type){
+    public boolean  verifyAndConsumeToken(String token, String email, String type){
         try{
             ApiFuture<QuerySnapshot> future = firestore.collection("activeTokens")
             .whereEqualTo("userEmail", email)
