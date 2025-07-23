@@ -23,10 +23,10 @@ public class RegisterService {
     //Logger para rastrear eventos y errores en la clase actual
     private static final Logger logger = LoggerFactory.getLogger(RegisterService.class);
     private final Firestore firestore;
-    private final ConfirmationEmailService confirmationEmailService;
+    private final AccountConfirmationEmailService confirmationEmailService;
     private final TokenService tokenService;
 
-    public RegisterService(Firestore firestore, ConfirmationEmailService confirmationEmailService, TokenService tokenService) {
+    public RegisterService(Firestore firestore, AccountConfirmationEmailService confirmationEmailService, TokenService tokenService) {
         this.firestore = firestore;
         this.confirmationEmailService = confirmationEmailService;
         this.tokenService = tokenService;
