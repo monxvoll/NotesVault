@@ -31,6 +31,12 @@ public class DeleteAccountController {
     public ResponseEntity<String> deleteAccount(@RequestBody DeleteAccountRequestDTO requestDTO) {
         logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", requestDTO.getEmail());
         try {
+            //Verificar si la cuenta existe y no esta eliminada
+            if(deletionEmailService.isAccountDeleted(requestDTO.getEmail())){
+                logger.warn("No se puede reenviar token: la cuenta {} ya está eliminada o inactiva", requestDTO.getEmail());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La cuenta no existe o esta inactiva");
+            }
+
             delete.deleteAccount(requestDTO.getUserName(),requestDTO.getEmail(), requestDTO.getPassword(), requestDTO.getConfirmPassword());
             logger.info("Correo de eliminación enviado correctamente a: {}", requestDTO.getEmail());
             return ResponseEntity.ok("Correo de confimación enviado exitosamente");
