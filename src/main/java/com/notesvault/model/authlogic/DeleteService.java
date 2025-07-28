@@ -1,7 +1,6 @@
 package com.notesvault.model.authlogic;
 
 import com.google.cloud.firestore.*;
-import org.apache.el.parser.Token;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +10,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class DeleteAccountService {
-    private static final Logger logger = LoggerFactory.getLogger(DeleteAccountService.class);
+public class DeleteService {
+    private static final Logger logger = LoggerFactory.getLogger(DeleteService.class);
     private final Firestore firestore;
     private final TokenService tokenService;
-    private final AccountDeletionEmailService  accountDeletionEmailService;
+    private final DeletionEmailService accountDeletionEmailService;
 
-    public DeleteAccountService(Firestore firestore, TokenService tokenService, AccountDeletionEmailService accountDeletionEmailService) {
+    public DeleteService(Firestore firestore, TokenService tokenService, DeletionEmailService accountDeletionEmailService) {
         this.firestore = firestore;
         this.tokenService = tokenService;
         this.accountDeletionEmailService = accountDeletionEmailService;

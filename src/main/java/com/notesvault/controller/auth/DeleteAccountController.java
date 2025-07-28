@@ -1,8 +1,8 @@
 package com.notesvault.controller.auth;
 
 import com.notesvault.dtos.DeleteAccountRequestDTO;
-import com.notesvault.model.authlogic.AccountDeletionEmailService;
-import com.notesvault.model.authlogic.DeleteAccountService;
+import com.notesvault.model.authlogic.DeletionEmailService;
+import com.notesvault.model.authlogic.DeleteService;
 import com.notesvault.model.authlogic.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/account") //Definicion Ruta Base del controlador
 public class DeleteAccountController {
     private static final Logger logger = LoggerFactory.getLogger(DeleteAccountController.class); //Para registrar eventos
-    private final DeleteAccountService delete; //Servicio Injectado
+    private final DeleteService delete; //Servicio Injectado
     private final TokenService tokenService;
-    private final AccountDeletionEmailService deletionEmailService;
+    private final DeletionEmailService deletionEmailService;
 
 
-    public DeleteAccountController(DeleteAccountService delete, TokenService tokenService, AccountDeletionEmailService deletionEmailService) {
+    public DeleteAccountController(DeleteService delete, TokenService tokenService, DeletionEmailService deletionEmailService) {
         this.delete = delete;
         this.tokenService = tokenService;
         this.deletionEmailService = deletionEmailService;

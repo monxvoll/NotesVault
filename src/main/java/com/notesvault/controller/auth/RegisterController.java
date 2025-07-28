@@ -1,7 +1,7 @@
 package com.notesvault.controller.auth;
 
 import com.notesvault.dtos.RegisterRequest;
-import com.notesvault.model.authlogic.AccountConfirmationEmailService;
+import com.notesvault.model.authlogic.ConfirmationEmailService;
 import com.notesvault.model.authlogic.RegisterService;
 import com.notesvault.model.authlogic.TokenService;
 import org.slf4j.Logger;
@@ -16,10 +16,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     private final RegisterService registerService;
-    private final AccountConfirmationEmailService confirmationEmailService;
+    private final ConfirmationEmailService confirmationEmailService;
     private final TokenService tokenService;
 
-    public RegisterController(RegisterService registerService, AccountConfirmationEmailService confirmationEmailService, TokenService tokenService) {
+    public RegisterController(RegisterService registerService, ConfirmationEmailService confirmationEmailService, TokenService tokenService) {
         this.registerService = registerService;
         this.confirmationEmailService = confirmationEmailService;
         this.tokenService = tokenService;

@@ -16,9 +16,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class AccountConfirmationEmailService {
+public class ConfirmationEmailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountConfirmationEmailService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfirmationEmailService.class);
     @Value("${app.confirmation.base-url}")
     private String baseUrl;
 
@@ -27,8 +27,8 @@ public class AccountConfirmationEmailService {
     private final Firestore firestore;
     private final Executor cleanupTaskExecutor;
 
-    public AccountConfirmationEmailService(EmailService emailService, TokenService tokenService, Firestore firestore,
-                                           @org.springframework.beans.factory.annotation.Qualifier("cleanupTaskExecutor") Executor cleanupTaskExecutor) {
+    public ConfirmationEmailService(EmailService emailService, TokenService tokenService, Firestore firestore,
+                                    @org.springframework.beans.factory.annotation.Qualifier("cleanupTaskExecutor") Executor cleanupTaskExecutor) {
         this.emailService = emailService;
         this.tokenService = tokenService;
         this.firestore = firestore;

@@ -19,9 +19,9 @@ import java.util.concurrent.Executor;
 
 
 @Service
-public class AccountDeletionEmailService {
+public class DeletionEmailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountDeletionEmailService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeletionEmailService.class);
     @Value("${app.elimination.base-url}")
     private String baseUrl;
 
@@ -30,7 +30,7 @@ public class AccountDeletionEmailService {
     private final Firestore firestore;
     private final Executor cleanupTaskExecutor;
 
-    public AccountDeletionEmailService(EmailService emailService, TokenService tokenService, Firestore firestore, Executor cleanupTaskExecutor) {
+    public DeletionEmailService(EmailService emailService, TokenService tokenService, Firestore firestore, Executor cleanupTaskExecutor) {
         this.emailService = emailService;
         this.tokenService = tokenService;
         this.firestore = firestore;
