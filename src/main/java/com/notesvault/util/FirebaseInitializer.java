@@ -6,7 +6,8 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.io.FileInputStream;
+import org.springframework.core.io.ClassPathResource;
+import java.io.InputStream;
 
 
 @Configuration //Le decimos a spring que esta clase es una fuente de beans (Un bean es un objeto listo para ser injectado)
@@ -15,8 +16,8 @@ public class FirebaseInitializer {
     @Bean //Se añade esta anotacion para que springboot puede hacer la injeccion de dependencias de firestore de forma automatica
     public Firestore firestore() {
         try {
-            FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebase-config.json");
-
+            ClassPathResource resource = new ClassPathResource("firebase-config.json");
+            InputStream serviceAccount = resource.getInputStream();
 
             if (serviceAccount == null) {
                 throw new RuntimeException("No se encontró el archivo de credenciales en resources/firebase-config.json");
