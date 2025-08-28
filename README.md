@@ -10,18 +10,27 @@ NotesVault is a cloud-based application for managing notes, allowing users to ea
 
 NotesVault was born from a personal interest in having my own application to manage notes, with a focus on **security**, **organization**, and **scalability**.
 
-## ⚡ Current Technologies
-- **Java** – Core language
-- **Spring Boot** – Backend framework (MVC architecture)
-- **Firestore** – Cloud database
-- **Postman** – API testing
+##  Current Technologies <img src="https://www.vectorlogo.zone/logos/java/java-icon.svg" alt="Java Logo" width="40"/>
 
-## Current Features (Tested with Postman) 🌱
+![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=white)
+![Firestore](https://img.shields.io/badge/Firestore-FFCA28?logo=firebase&logoColor=black)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?logo=postman&logoColor=white)
+
+
+## Current Features 🌱
 
 - Create, read, update, and delete notes (CRUD).
-- Account Confirmation trought token validation via email
-- Account Deletion trought token validation via email
-- Mark notes and accounts as inactive instead of permanent deletion.
-- Password recovert trought token
+- Account confirmation through token validation via email.
+- Account deletion through token validation via email.
+- Soft delete: notes and accounts are marked as inactive instead of permanent removal.
+- Password recovery through token validation.
 - Cloud storage with Firestore.
-- MVC architecture.
+- MVC architecture implemented with Spring Boot.
+
+## 🧪 Testing
+All API endpoints have been tested using Postman <img src="https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg" width="19"/>
+
+---
+
+*README in process…*
