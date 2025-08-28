@@ -10,7 +10,7 @@ NotesVault is a cloud-based application for managing notes, allowing users to ea
 
 NotesVault was born from a personal interest in having my own application to manage notes, with a focus on **security**, **organization**, and **scalability**.
 
-##  Current Technologies <img src="https://www.vectorlogo.zone/logos/java/java-icon.svg" alt="Java Logo" width="40"/>
+##  Current Technologies <img src="https://www.vectorlogo.zone/logos/java/java-icon.svg" alt="Java Logo" width="38"/>
 
 ![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=white)
