@@ -29,7 +29,7 @@ NotesVault was born from a personal interest in having my own application to man
 - MVC architecture implemented with Spring Boot.
 
 ## 🧪 Testing
-All API endpoints have been tested using Postman <img src="https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg" width="19"/>
+All API endpoints have been tested using Postman.
 
 ---
 
