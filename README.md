@@ -31,6 +31,47 @@ NotesVault was born from a personal interest in having my own application to man
 - Cloud storage with Firestore.
 - MVC architecture implemented with Spring Boot.
 
+## API Endpoints 📡
+
+🔐 Authentication
+
+- POST /auth/register — Registers a new user.
+
+- POST /auth/login — Logs in with valid credentials.
+
+- GET /auth/confirm — Confirms an account via email.
+
+- POST /auth/resend-confirmation — Resends the account confirmation email.
+
+👤 Account Management
+
+- DELETE /account/deleteAccount — Requests account deletion.
+
+- GET /account/delete-confirmation — Confirms account deletion via email.
+
+- POST /resend-delete-confirmation — Resends the account deletion confirmation email.
+
+🔑 Password Recovery
+
+- POST /recovery/request — Requests a password reset.
+
+- POST /recovery/verify-token — Verifies if a recovery token is valid.
+
+- POST /recovery/reset-password — Resends the password recovery email.
+
+- GET /recovery/reset — Resets the user’s password.
+
+📝 Notes
+
+- POST /note/create — Creates a new note.
+
+- GET /note/read — Retrieves the user’s notes.
+
+- PATCH /note/update — Updates an existing note.
+
+- DELETE /note/delete — Deletes a note.
+
+
 ## 🧪 Testing
 All API endpoints have been tested using Postman.
 
