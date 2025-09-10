@@ -26,6 +26,8 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - [ ] Token-based authentication for all note-related operations (CRUD)  
 - [ ] Enhanced security measures (improved token handling, etc...)  
 - [ ] Advanced search and tagging system for notes  
+- [ ] Auto-save and real-time synchronization of notes across devices 
+- [ ] Image support: attach and manage images within notes
 - [ ] RESTful API fully documented and standardized  
 - [ ] Frontend design prototype in Figma  
 - [ ] Desktop application version (embedded web app)  
