@@ -17,6 +17,20 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - Cloud storage with Firestore.
 - MVC architecture implemented with Spring Boot.
 
+## 📌 Current Progress and Planned Improvements
+
+- [x] Basic CRUD functionality for notes  
+- [x] Authentication system with registration, login, and email confirmation  
+- [x] Password recovery flow with token validation via email  
+- [x] Soft delete: notes and accounts are marked as inactive instead of permanently removed  
+- [ ] Token-based authentication for all note-related operations (CRUD)  
+- [ ] Enhanced security measures (improved token handling, etc...)  
+- [ ] Advanced search and tagging system for notes  
+- [ ] RESTful API fully documented and standardized  
+- [ ] Frontend design prototype in Figma  
+- [ ] Desktop application version (embedded web app)  
+- [ ] Additional improvements coming soon... 
+
 ##  API Endpoints 📡
 
 ### 🔑 Authentication
@@ -36,20 +50,6 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - **GET**    `/note/read`                Retrieve all notes for the authenticated user  
 - **PATCH**  `/note/update/{noteId}`     Update an existing note by ID  
 - **DELETE** `/note/delete`              Soft delete a note (mark as inactive)  
-
-## 📌 Current Progress and Planned Improvements
-
-- [x] Basic CRUD functionality for notes  
-- [x] Authentication system with registration, login, and email confirmation  
-- [x] Password recovery flow with token validation via email  
-- [x] Soft delete: notes and accounts are marked as inactive instead of permanently removed  
-- [ ] Token-based authentication for all note-related operations (CRUD)  
-- [ ] Enhanced security measures (improved token handling, etc...)  
-- [ ] Advanced search and tagging system for notes  
-- [ ] RESTful API fully documented and standardized  
-- [ ] Frontend design prototype in Figma  
-- [ ] Desktop application version (embedded web app)  
-- [ ] Additional improvements coming soon... 
 
 ## 🧪 Testing
  All endpoints have been tested using  Postman.
