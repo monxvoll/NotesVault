@@ -22,7 +22,9 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - [x] Basic CRUD functionality for notes  
 - [x] Authentication system with registration, login, and email confirmation  
 - [x] Password recovery flow with token validation via email  
-- [x] Soft delete: notes and accounts are marked as inactive instead of permanently removed  
+- [x] Soft delete: notes and accounts are marked as inactive instead of permanently removed
+- [ ] Encrypt notes content before storage
+- [ ] General Testing with github actions
 - [ ] Token-based authentication for all note-related operations (CRUD)  
 - [ ] Enhanced security measures (improved token handling, etc...)  
 - [ ] Advanced search and tagging system for notes  
