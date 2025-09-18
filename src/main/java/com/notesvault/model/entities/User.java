@@ -1,6 +1,8 @@
 package com.notesvault.model.entities;
 
 import com.google.cloud.firestore.annotation.ServerTimestamp;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,13 +23,13 @@ public class User {
         // Firestore needs an empty constructor to convert the document into a java object
     }
 
-    public User(String uid, String email, String userName, boolean isActive, boolean isConfirmed, List<Note> notesList) {
+    public User(String uid, String email, String userName) {
         this.uid = uid;
         this.email = email;
         this.userName = userName;
-        this.isActive = true; //Default value during registration
+        this.isActive = true;    
         this.isConfirmed = false;
-        this.notesList = notesList;
+        this.notesList = new ArrayList<>();
     }
 
     public String getUid() {
