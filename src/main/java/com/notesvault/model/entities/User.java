@@ -1,9 +1,6 @@
 package com.notesvault.model.entities;
 
 import com.google.cloud.firestore.annotation.ServerTimestamp;
-import org.mindrot.jbcrypt.BCrypt;
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
