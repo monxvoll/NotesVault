@@ -67,7 +67,7 @@ public class RegisterController {
         logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}", email);
         try {
             // Verificar si el usuario existe
-            if (!registerService.existsUserByEmail(email)) {
+            if (!registerService.userExists(email)) {
                 logger.warn("Intento de reenvío para usuario inexistente: {}", email);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
             }
