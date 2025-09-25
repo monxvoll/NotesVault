@@ -66,7 +66,13 @@ public class RegisterService {
 
             logger.info("Proceso de registro para {} completado.", email);
 
-        } catch (FirebaseAuthException e) {
+        } catch (IllegalArgumentException e) {
+            // If the password is invalid before calling firestore
+            logger.error("Error de validación del SDK de Firebase: {}", e.getMessage());
+            String publicMessage = "La contraseña es inválida. Debe tener al menos 6 caracteres.";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, publicMessage);
+
+        }catch (FirebaseAuthException e) {
             // Handle Firebase Specific Errors
             logger.error("Error de Firebase al registrar a {}: {}", email, e.getAuthErrorCode(), e);
             String publicMessage;
