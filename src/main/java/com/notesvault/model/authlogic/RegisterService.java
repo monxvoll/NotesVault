@@ -69,28 +69,40 @@ public class RegisterService {
         } catch (IllegalArgumentException e) {
             // If the password is invalid before calling firestore
             logger.error("Error de validación del SDK de Firebase: {}", e.getMessage());
-            String publicMessage = "La contraseña es inválida. Debe tener al menos 6 caracteres.";
+            String publicMessage = "La contraseña es inválida. Debe tener al menos 8 caracteres.";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, publicMessage);
 
-        }catch (FirebaseAuthException e) {
-            // Handle Firebase Specific Errors
-            logger.error("Error de Firebase al registrar a {}: {}", email, e.getAuthErrorCode(), e);
+        } catch (FirebaseAuthException e) {
+            logger.error("Error de Firebase al registrar a {}:", email, e);
+
             String publicMessage;
             HttpStatus status;
 
-            //Get error code
-            String errorCode = e.getAuthErrorCode().name();
+            AuthErrorCode errorCode = e.getAuthErrorCode();
 
-            if (errorCode.equals("EMAIL_ALREADY_EXISTS")) {
-                publicMessage = "Este email ya se encuentra registrado.";
-                status = HttpStatus.CONFLICT;
-
-            } else if (errorCode.equals("WEAK_PASSWORD")) {
-                publicMessage = "La contraseña es demasiado débil. Debe tener al menos 6 caracteres.";
-                status = HttpStatus.BAD_REQUEST;
+            if (errorCode != null) {
+                // Handle SDK  exceptions
+                switch (errorCode) {
+                    case EMAIL_ALREADY_EXISTS:
+                        publicMessage = "Este email ya se encuentra registrado.";
+                        status = HttpStatus.CONFLICT;
+                        break;
+                    default:
+                        publicMessage = "Error interno al registrar el usuario.";
+                        status = HttpStatus.INTERNAL_SERVER_ERROR;
+                        break;
+                }
             } else {
-                publicMessage = "Error interno al registrar el usuario.";
-                status = HttpStatus.INTERNAL_SERVER_ERROR;
+              //Firebase Exceptions, like password politics
+                String errorMessage = (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
+
+                if (errorMessage != null && errorMessage.contains("PASSWORD_DOES_NOT_MEET_REQUIREMENTS")) {
+                    publicMessage = "La contraseña no cumple los requisitos (mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo).";
+                    status = HttpStatus.BAD_REQUEST;
+                } else {
+                    publicMessage = "Error desconocido al registrar el usuario.";
+                    status = HttpStatus.INTERNAL_SERVER_ERROR;
+                }
             }
             throw new ResponseStatusException(status, publicMessage);
         }
