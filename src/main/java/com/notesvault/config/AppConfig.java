@@ -1,5 +1,6 @@
 package com.notesvault.config;
 
+import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,5 +29,14 @@ public class AppConfig {
     @Bean
     public org.slf4j.Logger appLogger() {
         return org.slf4j.LoggerFactory.getLogger("NotesVault");
+    }
+
+    /**
+     * Bean for  FirebaseAuth
+     * @return Instance of FirebaseAuth
+     */
+    @Bean
+    public com.google.firebase.auth.FirebaseAuth firebaseAuth() {
+        return com.google.firebase.auth.FirebaseAuth.getInstance();
     }
 } 

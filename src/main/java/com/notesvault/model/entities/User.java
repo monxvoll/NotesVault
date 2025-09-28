@@ -1,42 +1,90 @@
 package com.notesvault.model.entities;
 
-import org.mindrot.jbcrypt.BCrypt;
+import com.google.cloud.firestore.annotation.ServerTimestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class User {
 
+    private String uid;
     private String email;
     private String userName;
-    private String password;
+    private boolean isActive;
+    private boolean isConfirmed;
+
+    @ServerTimestamp // Firestore fill this variable, automatically
+    private Date createdAt;
+
 
     private List<Note> notesList;
-    public User(){
-
+    public User() {
+        // Firestore needs an empty constructor to convert the document into a java object
     }
-    public User(String email,String userName, String password) {
+
+    public User(String uid, String email, String userName) {
+        this.uid = uid;
         this.email = email;
         this.userName = userName;
-        this.password = hashPassword(password);
-        notesList = new ArrayList<>();
+        this.isActive = true;    
+        this.isConfirmed = false;
+        this.notesList = new ArrayList<>();
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-    public String getEmail() {
-        return email;
-    }
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public void setPassword(String password) {
-        this.password =  hashPassword(password);
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        isConfirmed = confirmed;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<Note> getNotesList() {
+        return notesList;
+    }
+
+    public void setNotesList(List<Note> notesList) {
+        this.notesList = notesList;
     }
 }
