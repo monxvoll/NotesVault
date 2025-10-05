@@ -1,11 +1,13 @@
 package com.notesvault.model.authlogic;
 
 
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.notesvault.model.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -83,6 +85,27 @@ public class DeleteService {
             return true;
         } catch (Exception e) {
             logger.error("Error al procesar la eliminación de la cuenta para {}: {}", email, e.getMessage());
+            return false;
+        }
+    }
+
+
+    public boolean isAccountDeleted(String email){
+        try{
+            String uid = firebaseAuth.getUserByEmail(email).getUid();
+            UserRecord userRecord = firebaseAuth.getUser(uid);
+
+            // We checked both on auth both firestore
+            DocumentSnapshot document= firestore.collection("users").document(uid).get().get();
+            Boolean isActiveInFirestore = document.exists() ? document.getBoolean("isActive") : Boolean.FALSE;
+
+            return userRecord.isDisabled() || Boolean.FALSE.equals(isActiveInFirestore);
+            
+        }catch (FirebaseAuthException e) {
+            logger.error("Error de Firebase al verificar estado de eliminación para {}: {}", email, e.getMessage());
+            return false;
+        } catch (Exception e) {
+            logger.error("Error general al verificar estado de eliminación para {}: {}", email, e.getMessage());
             return false;
         }
     }
