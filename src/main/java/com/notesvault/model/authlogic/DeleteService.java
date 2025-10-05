@@ -100,7 +100,7 @@ public class DeleteService {
             Boolean isActiveInFirestore = document.exists() ? document.getBoolean("isActive") : Boolean.FALSE;
 
             return userRecord.isDisabled() || Boolean.FALSE.equals(isActiveInFirestore);
-            
+
         }catch (FirebaseAuthException e) {
             logger.error("Error de Firebase al verificar estado de eliminación para {}: {}", email, e.getMessage());
             return false;
