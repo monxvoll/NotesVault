@@ -1,5 +1,6 @@
 package com.notesvault.config;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,7 @@ public class AppConfig {
      * @return Instance of FirebaseAuth
      */
     @Bean
-    public com.google.firebase.auth.FirebaseAuth firebaseAuth() {
-        return com.google.firebase.auth.FirebaseAuth.getInstance();
+    public FirebaseAuth firebaseAuth(FirebaseApp firebaseApp) {
+        return FirebaseAuth.getInstance(firebaseApp);
     }
 } 
