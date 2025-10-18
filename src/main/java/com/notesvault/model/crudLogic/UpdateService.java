@@ -23,10 +23,10 @@ public class UpdateService {
         this.firestore = firestore;
     }
 
-    public void updateNote(String noteId, NoteDTO noteDTO, String userEmail) {
+    public void updateNote(String noteId, NoteDTO noteDTO, String uid) {
         Map<String, Object> updates = new HashMap<>();
         try {
-            logger.info("Intentando actualizar nota con id {} de usuario {}", noteId, userEmail);
+            logger.info("Intentando actualizar nota con id {} de usuario {}", noteId, uid);
 
             if(noteDTO.getTitle()!=null) updates.put("title",noteDTO.getTitle());
 
@@ -36,12 +36,12 @@ public class UpdateService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             updates.put("date", now.format(formatter));
 
-            DocumentReference noteRef = firestore.collection("users").document(userEmail).collection("notesList").document(noteId);
+            DocumentReference noteRef = firestore.collection("users").document(uid).collection("notesList").document(noteId);
 
             noteRef.update(updates).get(); //Ejecutar actualizacion
 
         }catch (ExecutionException | InterruptedException e) {
-            logger.error("Error inesperado al intentar al actualizacion de la nota {} para el usuario {}: {}",noteId,userEmail, e.getMessage());
+            logger.error("Error inesperado al intentar al actualizacion de la nota {} para el usuario {}: {}",noteId,uid, e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al intentar actualizar nota");
         }
     }
