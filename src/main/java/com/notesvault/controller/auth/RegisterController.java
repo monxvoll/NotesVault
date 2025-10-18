@@ -1,9 +1,9 @@
 package com.notesvault.controller.auth;
 
 import com.notesvault.dtos.RegisterRequestDTO;
-import com.notesvault.model.authlogic.ConfirmationEmailService;
-import com.notesvault.model.authlogic.RegisterService;
-import com.notesvault.model.authlogic.TokenService;
+import com.notesvault.model.account.ConfirmationEmailService;
+import com.notesvault.model.account.RegisterService;
+import com.notesvault.model.account.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

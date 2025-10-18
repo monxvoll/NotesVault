@@ -4,7 +4,7 @@ import com.notesvault.dtos.PasswordRecoveryRequestDTO;
 import com.notesvault.dtos.PasswordResetRequestDTO;
 import com.notesvault.dtos.TokenVerificationRequestDTO;
 import com.notesvault.exceptions.UserNotFoundException;
-import com.notesvault.model.authlogic.PasswordRecoveryService;
+import com.notesvault.model.account.PasswordRecoveryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

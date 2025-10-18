@@ -1,8 +1,8 @@
 package com.notesvault.controller.auth;
 
-import com.notesvault.model.authlogic.DeletionEmailService;
-import com.notesvault.model.authlogic.DeleteService;
-import com.notesvault.model.authlogic.TokenService;
+import com.notesvault.model.account.DeletionEmailService;
+import com.notesvault.model.account.DeleteService;
+import com.notesvault.model.account.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
