@@ -1,4 +1,4 @@
-package com.notesvault.model.authlogic;
+package com.notesvault.model.account;
 
 import com.notesvault.model.contracts.EmailService;
 import org.slf4j.Logger;

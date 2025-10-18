@@ -1,4 +1,4 @@
-package com.notesvault.model.authlogic;
+package com.notesvault.model.account;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;

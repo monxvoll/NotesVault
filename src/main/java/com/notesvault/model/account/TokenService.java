@@ -1,4 +1,4 @@
-package com.notesvault.model.authlogic;
+package com.notesvault.model.account;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TokenService {

@@ -1,4 +1,4 @@
-package com.notesvault.model.authlogic;
+package com.notesvault.model.account;
 
 
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -7,7 +7,6 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
-import com.notesvault.model.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

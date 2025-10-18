@@ -1,4 +1,4 @@
-package com.notesvault.model.authlogic;
+package com.notesvault.model.account;
 
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.AuthErrorCode;
