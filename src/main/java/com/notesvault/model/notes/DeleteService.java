@@ -10,11 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class DeleteNoteService {
-    private static final Logger logger = LoggerFactory.getLogger(DeleteNoteService.class);
+public class DeleteService {
+    private static final Logger logger = LoggerFactory.getLogger(DeleteService.class);
     private final Firestore firestore;
 
-    public DeleteNoteService(Firestore firestore) {
+    public DeleteService(Firestore firestore) {
         this.firestore = firestore;
     }
 

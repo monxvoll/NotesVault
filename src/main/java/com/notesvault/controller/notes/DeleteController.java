@@ -1,6 +1,6 @@
 package com.notesvault.controller.notes;
 
-import com.notesvault.model.notes.DeleteNoteService;
+import com.notesvault.model.notes.DeleteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/note")
 public class DeleteController {
     private static final Logger logger = LoggerFactory.getLogger(DeleteController.class);
-    private final DeleteNoteService deleteService;
+    private final DeleteService deleteService;
 
-    public DeleteController(DeleteNoteService deleteService){
+    public DeleteController(DeleteService deleteService){
         this.deleteService = deleteService;
     }
 
