@@ -1,6 +1,6 @@
 package com.notesvault.controller.crud;
 
-import com.notesvault.model.crudLogic.DeleteNoteService;
+import com.notesvault.model.notes.DeleteNoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

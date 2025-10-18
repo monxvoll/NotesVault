@@ -1,4 +1,4 @@
-package com.notesvault.model.crudLogic;
+package com.notesvault.model.notes;
 
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;

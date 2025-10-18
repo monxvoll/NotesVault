@@ -1,6 +1,6 @@
 package com.notesvault.controller.crud;
 
-import com.notesvault.model.crudLogic.ReadService;
+import com.notesvault.model.notes.ReadService;
 import org.slf4j.LoggerFactory;
 import com.notesvault.model.entities.Note;
 import org.springframework.http.ResponseEntity;

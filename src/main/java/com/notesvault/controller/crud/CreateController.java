@@ -1,6 +1,6 @@
 package com.notesvault.controller.crud;
 
-import com.notesvault.model.crudLogic.CreateService;
+import com.notesvault.model.notes.CreateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

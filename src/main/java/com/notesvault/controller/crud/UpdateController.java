@@ -1,7 +1,7 @@
 package com.notesvault.controller.crud;
 
 import com.notesvault.dtos.NoteDTO;
-import com.notesvault.model.crudLogic.UpdateService;
+import com.notesvault.model.notes.UpdateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
