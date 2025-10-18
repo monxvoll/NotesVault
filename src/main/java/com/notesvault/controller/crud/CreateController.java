@@ -20,11 +20,11 @@ public class CreateController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createNote(@RequestParam String userEmail, @RequestParam String title, @RequestParam String content){
-        logger.info("Solicitud de creacion de nota recibida para usuario: {}", userEmail);
+    public ResponseEntity<String> createNote(@RequestParam String uid, @RequestParam String title, @RequestParam String content){
+        logger.info("Solicitud de creacion de nota recibida para usuario: {}", uid);
         try {
-            createService.createNote(userEmail, title, content);
-            logger.info("Solicitud de creacion de nota exitosa para usuario: {}", userEmail);
+            createService.createNote(uid, title, content);
+            logger.info("Solicitud de creacion de nota exitosa para usuario: {}", uid);
             return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
         }catch (ResponseStatusException e) {
             logger.warn("Error de validación en el registro: {}", e.getMessage());

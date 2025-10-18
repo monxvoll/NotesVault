@@ -22,9 +22,9 @@ public class CreateService {
         this.firestore = firestore;
     }
 
-    public void createNote(String userEmail, String title, String content){
+    public void createNote(String uid, String title, String content){
         if (validateNotEmpty(title, content)) {
-            logger.info("Iniciando creación de nota para usuario: {}", userEmail);
+            logger.info("Iniciando creación de nota para usuario: {}", uid);
 
             LocalDateTime localDateTime = LocalDateTime.now();
             String exclusiveId = UUID.randomUUID().toString();   //Genera un ID unico utilizando UUID y lo convierte a String
@@ -32,13 +32,13 @@ public class CreateService {
             DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             String date = localDateTime.format(format);
             Note note = new Note(title, content, date, exclusiveId,isActive);
-            addNote(userEmail, note);
+            addNote(uid, note);
         }
     }
 
-    private void addNote(String userEmail, Note note) {
+    private void addNote(String uid, Note note) {
         try {
-            DocumentReference userRef = firestore.collection("users").document(userEmail);
+            DocumentReference userRef = firestore.collection("users").document(uid);
             CollectionReference notesRef = userRef.collection("notesList");
 
             ApiFuture<WriteResult> future = notesRef.document(note.getId()).set(note);
