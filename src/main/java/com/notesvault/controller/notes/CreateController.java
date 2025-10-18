@@ -1,4 +1,4 @@
-package com.notesvault.controller.crud;
+package com.notesvault.controller.notes;
 
 import com.notesvault.model.notes.CreateService;
 import org.slf4j.Logger;
