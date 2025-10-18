@@ -1,4 +1,4 @@
-package com.notesvault.controller.auth;
+package com.notesvault.controller.account;
 
 import com.notesvault.dtos.RegisterRequestDTO;
 import com.notesvault.model.account.ConfirmationEmailService;
