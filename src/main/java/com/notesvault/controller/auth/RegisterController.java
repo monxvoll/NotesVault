@@ -1,6 +1,6 @@
 package com.notesvault.controller.auth;
 
-import com.notesvault.dtos.RegisterRequest;
+import com.notesvault.dtos.RegisterRequestDTO;
 import com.notesvault.model.authlogic.ConfirmationEmailService;
 import com.notesvault.model.authlogic.RegisterService;
 import com.notesvault.model.authlogic.TokenService;
@@ -26,7 +26,7 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> registerUser(@RequestBody RegisterRequestDTO request) {
         logger.info("Solicitud de registro recibida para usuario: {} ", request.getUserName());
         try {
             registerService.registerUser(request);

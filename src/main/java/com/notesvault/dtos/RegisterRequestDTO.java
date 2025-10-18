@@ -1,6 +1,6 @@
 package com.notesvault.dtos;
 
-public class RegisterRequest {
+public class RegisterRequestDTO {
     //Dto para manejar verificaciones antes de interactuar con la base de datos
     private String email;
     private String userName;

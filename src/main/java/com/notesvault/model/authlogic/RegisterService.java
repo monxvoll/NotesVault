@@ -5,7 +5,7 @@ import com.google.firebase.auth.AuthErrorCode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
-import com.notesvault.dtos.RegisterRequest;
+import com.notesvault.dtos.RegisterRequestDTO;
 import com.notesvault.model.entities.User;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class RegisterService {
         this.firebaseAuth = firebaseAuth;
     }
 
-    public void registerUser(RegisterRequest request)  {
+    public void registerUser(RegisterRequestDTO request)  {
         logger.info("Intentando registrar usuario: {} ({})", request.getUserName(), request.getEmail());
         String email = request.getEmail();
         String password = request.getPassword();
