@@ -25,10 +25,10 @@ public class ReadController {
     }
 
     @GetMapping("/read")
-    public ResponseEntity<?> readNote(@RequestParam String userEmail){
+    public ResponseEntity<?> readNote(@RequestParam String uid){
         try {
-            List<Note> notes = readService.readNote(userEmail);
-            logger.info("Solicitud de lectura para el usuario: {}",userEmail);
+            List<Note> notes = readService.readNote(uid);
+            logger.info("Solicitud de lectura para el usuario: {}",uid);
             return ResponseEntity.ok(notes);
         }catch (ResponseStatusException e){
             logger.error("Error en la consulta de las nota: {}", e.getMessage());
