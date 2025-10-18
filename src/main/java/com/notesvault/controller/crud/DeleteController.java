@@ -18,11 +18,11 @@ public class DeleteController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteNote(@RequestParam String userEmail,@RequestParam  String noteId) {
+    public ResponseEntity<String> deleteNote(@RequestParam String uid,@RequestParam  String noteId) {
         logger.info("Solicitud de eliminacion para nota con ID: {}",noteId);
         try{
-            deleteService.deleteNote(userEmail,noteId);
-            logger.info("Solicitud de eliminacion exitosa para usuario: {}", userEmail);
+            deleteService.deleteNote(uid,noteId);
+            logger.info("Solicitud de eliminacion exitosa para usuario: {}", uid);
             return ResponseEntity.ok("Nota eliminada exitosamente");
         } catch (ResponseStatusException e) {
             logger.error("Error en la eliminacion de la nota: {}", e.getMessage());

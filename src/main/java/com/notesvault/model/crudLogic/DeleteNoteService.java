@@ -18,12 +18,12 @@ public class DeleteNoteService {
         this.firestore = firestore;
     }
 
-    public void deleteNote(String userEmail, String noteId) {
+    public void deleteNote(String uid, String noteId) {
         try {
-            logger.info("Intentando eliminar la nota con ID {} para el usuario {}", noteId, userEmail);
+            logger.info("Intentando eliminar la nota con ID {} para el usuario {}", noteId, uid);
 
             // Referencia a la nota
-            DocumentReference noteRef = firestore.collection("users").document(userEmail).collection("notesList").document(noteId);
+            DocumentReference noteRef = firestore.collection("users").document(uid).collection("notesList").document(noteId);
 
             // Verificamos si la nota existe
             ApiFuture<DocumentSnapshot> future = noteRef.get();
