@@ -1,7 +1,7 @@
 package com.notesvault.controller.account;
 
 import com.notesvault.model.account.DeletionEmailService;
-import com.notesvault.model.account.DeleteService;
+import com.notesvault.model.account.DeletionService;
 import com.notesvault.model.account.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +15,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/account")
 public class DeleteAccountController {
     private static final Logger logger = LoggerFactory.getLogger(DeleteAccountController.class);
-    private final DeleteService deleteService;
+    private final DeletionService deleteService;
     private final TokenService tokenService;
     private final DeletionEmailService deletionEmailService;
 
 
-    public DeleteAccountController(DeleteService deleteService, TokenService tokenService, DeletionEmailService deletionEmailService) {
+    public DeleteAccountController(DeletionService deleteService, TokenService tokenService, DeletionEmailService deletionEmailService) {
         this.deleteService = deleteService;
         this.tokenService = tokenService;
         this.deletionEmailService = deletionEmailService;

@@ -18,15 +18,15 @@ import java.util.concurrent.Executor;
 
 
 @Service
-public class DeleteService {
-    private static final Logger logger = LoggerFactory.getLogger(DeleteService.class);
+public class DeletionService {
+    private static final Logger logger = LoggerFactory.getLogger(DeletionService.class);
     private final FirebaseAuth firebaseAuth;
     private final TokenService tokenService;
     private final DeletionEmailService accountDeletionEmailService;
     private final Firestore firestore;
     private final Executor cleanupTaskExecutor;
 
-    public DeleteService(FirebaseAuth firebaseAuth, TokenService tokenService, DeletionEmailService accountDeletionEmailService, Firestore firestore, Executor cleanupTaskExecutor) {
+    public DeletionService(FirebaseAuth firebaseAuth, TokenService tokenService, DeletionEmailService accountDeletionEmailService, Firestore firestore, Executor cleanupTaskExecutor) {
         this.firebaseAuth = firebaseAuth;
         this.tokenService = tokenService;
         this.accountDeletionEmailService = accountDeletionEmailService;
