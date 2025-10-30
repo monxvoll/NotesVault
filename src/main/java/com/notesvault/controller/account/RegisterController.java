@@ -30,13 +30,13 @@ public class RegisterController {
         logger.info("Solicitud de registro recibida para usuario: {} ", request.getUserName());
         try {
             registerService.registerUser(request);
-            logger.info("Registro exitoso para usuario: {} ({})", request.getUserName(), request.getEmail());
+            logger.info("Registro exitoso para usuario: {}", request.getUserName());
             return ResponseEntity.status(HttpStatus.CREATED).body("Se ha enviado un correo de confirmación.");
         } catch (ResponseStatusException e) {
-            logger.error("Error en el registro para usuario {}: {} - {}", request.getEmail(), e.getStatusCode(), e.getReason());
+            logger.error("Error en el registro para usuario {}: {} - {}", request.getUserName(), e.getStatusCode(), e.getReason());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
-            logger.error("Error inesperado en el registro para usuario {}: {}", request.getEmail(), e.getMessage());
+            logger.error("Error inesperado en el registro para usuario {}: {}", request.getUserName(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
         }
     }
@@ -44,58 +44,52 @@ public class RegisterController {
     @GetMapping("/confirm")
     public ResponseEntity<?> confirmAccount(
         @RequestParam("token") String token,
-        @RequestParam("email") String email
+        @RequestParam("uid") String uid
     ){
-        logger.info("Solicitud de confirmación de cuenta para usuario: {}", email);
+        logger.info("Solicitud de confirmación de cuenta para usuario: {}", uid);
         try{
-            boolean isConfirmed = confirmationEmailService.confirmAccount(token, email);
+            boolean isConfirmed = confirmationEmailService.confirmAccount(token, uid);
             if(isConfirmed){
-                logger.info("Cuenta confirmada exitosamente para usuario: {}", email);
+                logger.info("Cuenta confirmada exitosamente para usuario: {}", uid);
                 return ResponseEntity.ok("Cuenta confirmada exitosamente");
             }else{
-                logger.warn("Error al confirmar la cuenta para usuario: {} - Token inválido o ya consumido", email);
+                logger.warn("Error al confirmar la cuenta para usuario: {} - Token inválido o ya consumido", uid);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al confirmar la cuenta. El enlace puede ser inválido o ya haber sido utilizado.");
             }
         }catch(Exception e){
-            logger.error("Error al confirmar la cuenta para usuario {}: {}", email, e.getMessage());
+            logger.error("Error al confirmar la cuenta para usuario {}: {}", uid, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al confirmar la cuenta");
         }
     }
     
     @PostMapping("/resend-confirmation")
-    public ResponseEntity<?> resendConfirmationEmail(@RequestParam("email") String email) {
-        logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}", email);
+    public ResponseEntity<?> resendConfirmationEmail(@RequestParam("uid") String uid, @RequestParam("email") String email) {
+        logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}", uid);
         try {
-            // Verificar si el usuario existe
-            if (!registerService.userExists(email)) {
-                logger.warn("Intento de reenvío para usuario inexistente: {}", email);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-            }
-            
+
             // Verificar si el usuario ya está confirmado
-            if (confirmationEmailService.isUserConfirmed(email)) {
-                logger.warn("Intento de reenvío para usuario ya confirmado: {}", email);
+            if (confirmationEmailService.isUserConfirmed(uid)) {
+                logger.warn("Intento de reenvío para usuario ya confirmado: {}", uid);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya está confirmado");
             }
             
             // Generar nuevo token de confirmación
-            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(email, "confirmation");
-            logger.info("Nuevo token de confirmación generado para usuario: {}", email);
+            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(uid, "confirmation");
+            logger.info("Nuevo token de confirmación generado para usuario: {}", uid);
             
             // Enviar correo de confirmación de forma asíncrona
-            confirmationEmailService.sendConfirmationEmailAsync(email, tokenInfo.getRawToken(), null)
+            confirmationEmailService.sendConfirmationEmailAsync(uid , email, tokenInfo.getRawToken(), null)
                 .exceptionally(throwable -> {
-                    logger.error("Error al reenviar correo de confirmación a {}: {}", email, throwable.getMessage());
+                    logger.error("Error al reenviar correo de confirmación a {}: {}", uid, throwable.getMessage());
                     return null;
                 });
             
-            logger.info("Correo de confirmación reenviado exitosamente para usuario: {}", email);
+            logger.info("Correo de confirmación reenviado exitosamente para usuario: {}", uid);
             return ResponseEntity.ok("Correo de confirmación reenviado exitosamente");
             
         } catch (Exception e) {
-            logger.error("Error al reenviar correo de confirmación para usuario {}: {}", email, e.getMessage());
+            logger.error("Error al reenviar correo de confirmación para usuario {}: {}", uid, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al reenviar el correo de confirmación");
         }
     }
-
 }

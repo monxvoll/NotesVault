@@ -41,14 +41,14 @@ public class TokenService {
 
     /**
      * Genera un token seguro para el usuario
-     * @param email Email del usuario
+     * @param uid uid del usuario
      * @param type Tipo de token (confirmation, recovery)
      * @return Información del token generado
      */
-    public GeneratedTokenInfo generateSecureToken(String email, String type) {
-        if (email == null || email.trim().isEmpty()) {
-            logger.warn("Intento generar token sin email");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email del usuario es obligatorio para generar el token");
+    public GeneratedTokenInfo generateSecureToken(String uid, String type) {
+        if (uid == null || uid.trim().isEmpty()) {
+            logger.warn("Intento generar token sin uid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El uid del usuario es obligatorio para generar el token");
         }
 
         byte[] randomBytes = new byte[TOKEN_BYTE_LENGTH];
@@ -64,23 +64,23 @@ public class TokenService {
 
         Map<String, Object> tokenData = new HashMap<>();
 
-        tokenData.put("userEmail", email);
+        tokenData.put("uid", uid);
         tokenData.put("expirationTime", Timestamp.of(java.util.Date.from(expirationTime)));
         tokenData.put("hashedToken", hashedToken);
         tokenData.put("type", type);
 
-        logger.info("Almacenando token hasheado en Firestore para usuario: {}", email);
+        logger.info("Almacenando token hasheado en Firestore para usuario: {}", uid);
 
         ApiFuture<WriteResult> writeResultFuture = firestore.collection("activeTokens").document(documentId).set(tokenData);
 
         try {
             WriteResult writeResult = writeResultFuture.get();
-            logger.info("Token hasheado almacenado con éxito para usuario {} (UpdateTime: {})", email, writeResult.getUpdateTime());
+            logger.info("Token hasheado almacenado con éxito para usuario {} (UpdateTime: {})", uid, writeResult.getUpdateTime());
         } catch (InterruptedException e) {
-            logger.error("Interrupción durante la escritura del token en Firestore para {}: {}", email, e.getMessage());
+            logger.error("Interrupción durante la escritura del token en Firestore para {}: {}", uid, e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al almacenar el token", e);
         } catch (ExecutionException e) {
-            logger.error("Error de ejecución durante la escritura del token en Firestore para {}: {}", email, e.getMessage());
+            logger.error("Error de ejecución durante la escritura del token en Firestore para {}: {}", uid, e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al almacenar el token", e);
         }
 
@@ -90,14 +90,14 @@ public class TokenService {
     /**
      * Verifica si un token es válido para un usuario y tipo específico
      * @param token Token a verificar
-     * @param email Email del usuario
+     * @param uid uid del usuario
      * @param type Tipo de token (confirmation, recovery)
      * @return true si el token es válido, false en caso contrario
      */
-    public boolean verifyToken(String token, String email, String type){
+    public boolean verifyToken(String token, String uid, String type){
         try{
             ApiFuture<QuerySnapshot> future = firestore.collection("activeTokens")
-            .whereEqualTo("userEmail", email)
+            .whereEqualTo("uid", uid)
             .whereEqualTo("type", type)
             .limit(1)
             .get();
@@ -106,7 +106,7 @@ public class TokenService {
             List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
             if (documents.isEmpty()) {
-                logger.warn("No se encontraron tokens activos para el email: {}", email);
+                logger.warn("No se encontraron tokens activos para el uid: {}", uid);
                 return false;
             }
 
@@ -116,21 +116,21 @@ public class TokenService {
             if (BCrypt.checkpw(token, hashedToken)) {
                 Timestamp expirationTimestamp = document.getTimestamp("expirationTime");
                 if (expirationTimestamp == null) {
-                    logger.warn("Token sin timestamp de expiración para usuario: {}", email);
+                    logger.warn("Token sin timestamp de expiración para usuario: {}",uid);
                     return false;
                 }
                 Instant expirationTime = expirationTimestamp.toDate().toInstant();
                 if (Instant.now().isAfter(expirationTime)) {
-                    logger.warn("Token expirado para usuario: {}", email);
+                    logger.warn("Token expirado para usuario: {}", uid);
                     firestore.collection("activeTokens").document(document.getId()).delete();
                     return false;
                 }
 
-                logger.info("Token verificado exitosamente para usuario: {}", email);
+                logger.info("Token verificado exitosamente para usuario: {}", uid);
                 return true;
             }
 
-            logger.warn("Token no válido para el email: {}", email);
+            logger.warn("Token no válido para el email: {}", uid);
             return false;
         } catch (Exception e) {
             logger.error("Error al verificar token", e);
@@ -141,14 +141,14 @@ public class TokenService {
     /**
      * Verifica y consume un token (lo elimina después de verificar)
      * @param token Token a verificar
-     * @param email Email del usuario
+     * @param uid uid del usuario
      * @param type Tipo de token (confirmation, recovery)
      * @return true si el token es válido y fue consumido, false en caso contrario
      */
-    public boolean  verifyAndConsumeToken(String token, String email, String type){
+    public boolean  verifyAndConsumeToken(String token, String uid, String type){
         try{
             ApiFuture<QuerySnapshot> future = firestore.collection("activeTokens")
-            .whereEqualTo("userEmail", email)
+            .whereEqualTo("uid", uid)
             .whereEqualTo("type", type)
             .limit(1)
             .get();
@@ -157,7 +157,7 @@ public class TokenService {
             List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
             if (documents.isEmpty()) {
-                logger.warn("No se encontraron tokens activos para el email: {}", email);
+                logger.warn("No se encontraron tokens activos para el usuario: {}", uid);
                 return false;
             }
 
@@ -167,23 +167,23 @@ public class TokenService {
             if (BCrypt.checkpw(token, hashedToken)) {
                 Timestamp expirationTimestamp = document.getTimestamp("expirationTime");
                 if (expirationTimestamp == null) {
-                    logger.warn("Token sin timestamp de expiración para usuario: {}", email);
+                    logger.warn("Token sin timestamp de expiración para usuario: {}", uid);
                     return false;
                 }
                 Instant expirationTime = expirationTimestamp.toDate().toInstant();
                 if (Instant.now().isAfter(expirationTime)) {
-                    logger.warn("Token expirado para usuario: {}", email);
+                    logger.warn("Token expirado para usuario: {}", uid);
                     firestore.collection("activeTokens").document(document.getId()).delete();
                     return false;
                 }
 
                 // Token válido - eliminarlo después de verificar
                 firestore.collection("activeTokens").document(document.getId()).delete();
-                logger.info("Token verificado y consumido exitosamente para usuario: {}", email);
+                logger.info("Token verificado y consumido exitosamente para usuario: {}", uid);
                 return true;
             }
 
-            logger.warn("Token no válido para el email: {}", email);
+            logger.warn("Token no válido para el usuario: {}", uid);
             return false;
         } catch (Exception e) {
             logger.error("Error al verificar y consumir token", e);
@@ -193,14 +193,14 @@ public class TokenService {
 
     /**
      * Elimina todos los tokens activos para un usuario específico
-     * @param email Email del usuario
+     * @param uid uid del usuario
      * @param type Tipo de token (confirmation, recovery)
      * @return true si se eliminaron tokens, false en caso contrario
      */
-    public boolean deleteAllTokensForUser(String email, String type) {
+    public boolean deleteAllTokensForUser(String uid, String type) {
         try {
             ApiFuture<QuerySnapshot> tokensFuture = firestore.collection("activeTokens")
-                .whereEqualTo("userEmail", email)
+                .whereEqualTo("userUid", uid)
                 .whereEqualTo("type", type)
                 .get();
             
@@ -212,11 +212,11 @@ public class TokenService {
                 deletedCount++;
             }
             
-            logger.info("Eliminados {} tokens para usuario: {} (tipo: {})", deletedCount, email, type);
+            logger.info("Eliminados {} tokens para usuario: {} (tipo: {})", deletedCount, uid, type);
             return deletedCount > 0;
             
         } catch (Exception e) {
-            logger.error("Error al eliminar tokens para usuario {}: {}", email, e.getMessage());
+            logger.error("Error al eliminar tokens para usuario {}: {}", uid, e.getMessage());
             return false;
         }
     }
