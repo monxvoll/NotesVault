@@ -31,12 +31,12 @@ public class RegisterService {
     }
 
     public void registerUser(RegisterRequestDTO request)  {
-        logger.info("Intentando registrar usuario: {} ({})", request.getUserName(), request.getEmail());
+        logger.info("Intentando registrar usuario: {}", request.getUserName());
         String email = request.getEmail();
         String password = request.getPassword();
 
         if (!validateEmail(email)) {
-            logger.warn("Intento de registro con correo inválido: {}", email);
+            logger.warn("Intento de registro con correo inválido");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo electrónico invalido");
         }
 
@@ -57,14 +57,14 @@ public class RegisterService {
             logger.info("Perfil de usuario guardado en Firestore para UID: {}", uid);
 
             //Send confirmation email
-            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(email, "confirmation");
-            confirmationEmailService.sendConfirmationEmailAsync(email, tokenInfo.getRawToken(), request.getUserName())
+            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(uid, "confirmation");
+            confirmationEmailService.sendConfirmationEmailAsync(uid,email, tokenInfo.getRawToken(), request.getUserName())
                     .exceptionally(throwable -> {
-                        logger.error("Error al enviar correo de confirmación a {}: {}", email, throwable.getMessage());
+                        logger.error("Error al enviar correo de confirmación a {}: {}", uid, throwable.getMessage());
                         return null;
                     });
 
-            logger.info("Proceso de registro para {} completado.", email);
+            logger.info("Proceso de registro para {} completado.", uid);
 
         } catch (IllegalArgumentException e) {
             // If the password is invalid before calling firestore
@@ -73,7 +73,7 @@ public class RegisterService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, publicMessage);
 
         } catch (FirebaseAuthException e) {
-            logger.error("Error de Firebase al registrar a {}:", email, e);
+            logger.error("Error de Firebase al registrar a {}:", request.getUserName(), e);
 
             String publicMessage;
             HttpStatus status;
@@ -105,19 +105,6 @@ public class RegisterService {
                 }
             }
             throw new ResponseStatusException(status, publicMessage);
-        }
-    }
-
-    public boolean userExists(String email) {
-        try {
-            // This method return an exception if the email doesnt exist
-            firebaseAuth.getUserByEmail(email);
-            return true;
-        } catch (FirebaseAuthException e) {
-            if (e.getAuthErrorCode() == AuthErrorCode.USER_NOT_FOUND || e.getAuthErrorCode() == AuthErrorCode.EMAIL_NOT_FOUND) {
-                return false;
-            }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al verificar el usuario.", e);
         }
     }
 
