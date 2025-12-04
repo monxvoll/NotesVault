@@ -29,7 +29,8 @@ public class ReadService {
             //Referencia a la coleccion de notas
             CollectionReference notesRef = firestore.collection("users").document(uid).collection("notesList");
 
-            ApiFuture<QuerySnapshot> future = notesRef.get();
+            ApiFuture<QuerySnapshot> future = notesRef.whereEqualTo("active", true).get();
+
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
             if (documents.isEmpty()) {
@@ -42,6 +43,7 @@ public class ReadService {
                 Note note = doc.toObject(Note.class);
                 noteList.add(note);
             }
+
             logger.info("Notas consultadas con exito para usuario {}", uid);
             return noteList;
         } catch (InterruptedException | ExecutionException e){
