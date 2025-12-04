@@ -58,6 +58,6 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - **DELETE** `/note/delete`              Soft delete a note (mark as inactive)  
 
 ## 🧪 Testing
- All endpoints have been tested using  Postman.
+ All endpoints have been tested using Postman and Swagger UI.
 
 ---
