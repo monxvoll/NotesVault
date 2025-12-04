@@ -35,7 +35,6 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - [ ] Image support: attach and manage images within notes
 - [ ] RESTful API fully documented and standardized  
 - [ ] Frontend design prototype in Figma  
-- [ ] Desktop application version (embedded web app)  
 - [ ] Additional improvements coming soon... 
 
 ##  API Endpoints 📡
@@ -59,6 +58,6 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - **DELETE** `/note/delete`              Soft delete a note (mark as inactive)  
 
 ## 🧪 Testing
- All endpoints have been tested using  Postman.
+ All endpoints have been tested using Postman and Swagger UI.
 
 ---
