@@ -1,0 +1,40 @@
+# Server Config
+server.port=8080
+
+# Email Config - Gmail
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=**
+spring.mail.password=**
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Performance Email Config
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+spring.mail.properties.mail.smtp.quitwait=false
+
+# Pool of JavaMailSender
+spring.mail.properties.mail.smtp.connectionpoolsize=5
+spring.mail.properties.mail.smtp.connectionpooltimeout=300000
+
+# URl config
+
+# Password Recovery
+# Example: http://localhost:8080
+app.recovery.base-url=http://localhost:8080
+
+# Account Confirmation
+# Domain +  AuthController Route + /.
+# Example: http://localhost:8080/auth/
+app.confirmation.base-url=**
+
+#Account Deletion
+# Domain +  AuthController Route + /.
+# Example: http://localhost:8080/account/
+app.elimination.base-url=**
+
+# Logging Config
+logging.level.com.notesvault=INFO
+logging.level.org.springframework.mail=DEBUG
