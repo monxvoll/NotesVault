@@ -1,6 +1,7 @@
 package com.notesvault.model.notes;
 
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.notesvault.dtos.NoteDTO;
 import org.slf4j.Logger;
@@ -28,6 +29,22 @@ public class UpdateService {
         try {
             logger.info("Intentando actualizar nota con id {} de usuario {}", noteId, uid);
 
+            DocumentReference noteRef = firestore.collection("users").document(uid).collection("notesList").document(noteId);
+            //Read Document
+            DocumentSnapshot document = noteRef.get().get();
+
+            if (!document.exists()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La nota no existe");
+            }
+
+            Boolean isActive = document.getBoolean("active");
+
+
+            if (isActive == null || !isActive) {
+                logger.warn("Intento de actualizar nota inactiva: {}", noteId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La nota no se encuentra disponible");
+            }
+
             if(noteDTO.getTitle()!=null) updates.put("title",noteDTO.getTitle());
 
             if(noteDTO.getContent()!=null) updates.put("content",noteDTO.getContent());
@@ -36,9 +53,9 @@ public class UpdateService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             updates.put("date", now.format(formatter));
 
-            DocumentReference noteRef = firestore.collection("users").document(uid).collection("notesList").document(noteId);
 
-            noteRef.update(updates).get(); //Ejecutar actualizacion
+            noteRef.update(updates).get();
+            logger.info("Nota actualizada correctamente");
 
         }catch (ExecutionException | InterruptedException e) {
             logger.error("Error inesperado al intentar al actualizacion de la nota {} para el usuario {}: {}",noteId,uid, e.getMessage());
