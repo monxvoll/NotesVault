@@ -34,17 +34,22 @@ public class DeletionService {
         this.cleanupTaskExecutor = cleanupTaskExecutor;
     }
 
-    public void initiateAccountDeletion(String email) {
-        logger.info("Solicitud para iniciar eliminacion de cuenta para: {}" + email);
+    public void initiateAccountDeletion(String uid) {
+        logger.info("Solicitud para iniciar eliminacion de cuenta para: {}" + uid);
 
         try {
-            firebaseAuth.getUserByEmail(email);
+            UserRecord  userRecord = firebaseAuth.getUser(uid);
+            String email = userRecord.getEmail();
+
+            if(email==null){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"El usuario no tiene un email asociado.");
+            }
 
             //Send token
-            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(email, "confirmation");
+            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(uid, "confirmation");
             logger.info("Token de confirmación de borrado generado para: {}", email);
 
-            accountDeletionEmailService.sendAccountDeletionAsync(email, tokenInfo.getRawToken(), null)
+            accountDeletionEmailService.sendAccountDeletionAsync(email, tokenInfo.getRawToken(), null, uid)
                     .exceptionally(throwable -> {
                         logger.error("Error al enviar correo de eliminación a {}: {}", email, throwable.getMessage());
                         return null;
@@ -54,57 +59,56 @@ public class DeletionService {
 
 
         } catch (FirebaseAuthException e) {
-            logger.error("Error de Firebase al buscar el usuario {}: {}", email, e.getAuthErrorCode());
+            logger.error("Error de Firebase al buscar el usuario {}: {}", uid, e.getAuthErrorCode());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no fue encontrado.", e);
         }
     }
 
-    public boolean confirmAccountDeletion(String token, String email) {
-        logger.info("Confirmando la eliminación de cuenta para: {}", email);
+    public boolean confirmAccountDeletion(String token, String uid) {
+        logger.info("Confirmando la eliminación de cuenta para: {}", uid);
 
-        if (!tokenService.verifyToken(token, email, "confirmation")) {
-            logger.warn("Token de eliminación inválido o ya consumido para: {}", email);
+        if (!tokenService.verifyToken(token, uid, "confirmation")) {
+            logger.warn("Token de eliminación inválido o ya consumido para: {}", uid);
             return false;
         }
         try {
-            String uid = firebaseAuth.getUserByEmail(email).getUid();
 
             // Disable account on firebase auth
             UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid).setDisabled(true);
             firebaseAuth.updateUser(request);
-            logger.info("Cuenta del usuario {} inhabilitada en Firebase Authentication.", email);
+            logger.info("Cuenta del usuario {} inhabilitada en Firebase Authentication.", uid);
 
             // Set account as disable on firestore
-            firestore.collection("users").document(uid).update("isActive", false, "deletedAt", FieldValue.serverTimestamp()).get();
-            logger.info("Perfil del usuario {} marcado como inactivo en Firestore.", email);
+            firestore.collection("users").document(uid).update("active", false, "deletedAt", FieldValue.serverTimestamp()).get();
+            logger.info("Perfil del usuario {} marcado como inactivo en Firestore.", uid);
 
             // Clean tokens
-            CompletableFuture.runAsync(() -> tokenService.deleteAllTokensForUser(email, "confirmation"), cleanupTaskExecutor);
+            CompletableFuture.runAsync(() -> tokenService.deleteAllTokensForUser(uid, "confirmation"), cleanupTaskExecutor);
 
             return true;
         } catch (Exception e) {
-            logger.error("Error al procesar la eliminación de la cuenta para {}: {}", email, e.getMessage());
+            logger.error("Error al procesar la eliminación de la cuenta para {}: {}", uid, e.getMessage());
             return false;
         }
     }
 
 
-    public boolean isAccountDeleted(String email){
+    public boolean isAccountDeleted(String uid){
         try{
-            String uid = firebaseAuth.getUserByEmail(email).getUid();
+
             UserRecord userRecord = firebaseAuth.getUser(uid);
 
             // We checked both on auth both firestore
             DocumentSnapshot document= firestore.collection("users").document(uid).get().get();
-            Boolean isActiveInFirestore = document.exists() ? document.getBoolean("isActive") : Boolean.FALSE;
+            Boolean isActiveInFirestore = document.exists() ? document.getBoolean("active") : Boolean.FALSE;
 
             return userRecord.isDisabled() || Boolean.FALSE.equals(isActiveInFirestore);
 
         }catch (FirebaseAuthException e) {
-            logger.error("Error de Firebase al verificar estado de eliminación para {}: {}", email, e.getMessage());
+            logger.error("Error de Firebase al verificar estado de eliminación para {}: {}", uid, e.getMessage());
             return false;
         } catch (Exception e) {
-            logger.error("Error general al verificar estado de eliminación para {}: {}", email, e.getMessage());
+            logger.error("Error general al verificar estado de eliminación para {}: {}", uid, e.getMessage());
             return false;
         }
     }

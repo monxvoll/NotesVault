@@ -27,11 +27,11 @@ public class DeleteAccountController {
     }
 
     @DeleteMapping("/deleteAccount")
-    public ResponseEntity<String> deleteAccount(@RequestParam String email) {
-        logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", email);
+    public ResponseEntity<String> deleteAccount(@RequestParam String uid) {
+        logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", uid);
         try {
-            deleteService.initiateAccountDeletion(email);
-            logger.info("Correo de eliminación enviado correctamente a: {}", email);
+            deleteService.initiateAccountDeletion(uid);
+            logger.info("Correo de eliminación enviado correctamente a: {}", uid);
             return ResponseEntity.ok("Correo de confimación enviado exitosamente");
         }catch (ResponseStatusException e) {
             logger.warn("Error al enviar el correo de confirmación: {}", e.getMessage());
@@ -41,49 +41,41 @@ public class DeleteAccountController {
 
     @GetMapping("/delete-confirmation")
     public ResponseEntity<?> deleteConfirmation(@RequestParam("token") String token,
-                                                @RequestParam("email") String email){
-        logger.info("Solicitud de confirmación de eliminacion de cuenta para usuario: {}",email);
+                                                @RequestParam("uid") String uid){
+        logger.info("Solicitud de confirmación de eliminacion de cuenta para usuario: {}",uid);
         try{
-            boolean isDelete = deleteService.confirmAccountDeletion(token, email);
+            boolean isDelete = deleteService.confirmAccountDeletion(token, uid);
             if(isDelete){
-                logger.info("Cuenta eliminada exitosamente para usuario: {}",email);
+                logger.info("Cuenta eliminada exitosamente para usuario: {}",uid);
                 return  ResponseEntity.ok("Cuenta eliminada exitosamente");
             }else {
-                logger.warn("Error al intentar eliminar la cuenta para usuario: {} - Token inválido o ya consumido",email);
+                logger.warn("Error al intentar eliminar la cuenta para usuario: {} - Token inválido o ya consumido",uid);
                 return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al intentar eliminar la cuenta. El enlace puede ser invalido");
             }
         }catch (Exception e){
-            logger.error("Error al eliminar la cuenta para usuario {}: {}",email,e.getMessage());
+            logger.error("Error al eliminar la cuenta para usuario {}: {}",uid,e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al intentar la eliminacion de cuenta");
         }
     }
 
     @PostMapping("/resend-delete-confirmation")
-    public ResponseEntity<?> resendConfirmationEmail(@RequestParam("email") String email){
-        logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}",email);
+    public ResponseEntity<?> resendConfirmationEmail(@RequestParam("uid") String uid){
+        logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}",uid);
         try{
 
-            if(deleteService.isAccountDeleted(email)){
-                logger.warn("No se puede reenviar token: la cuenta {} ya está eliminada o inactiva", email);
+            if(deleteService.isAccountDeleted(uid)){
+                logger.warn("No se puede reenviar token: la cuenta {} ya está eliminada o inactiva", uid);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La cuenta no existe o esta inactiva");
             }
 
-
-            TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(email, "confirmation");
-            logger.info("Nuevo token de eliminación generado para usuario: {}", email);
+            deleteService.initiateAccountDeletion(uid);
 
 
-            deletionEmailService.sendAccountDeletionAsync(email, tokenInfo.getRawToken(), null)
-                    .exceptionally(throwable -> {
-                        logger.error("Error al reenviar correo de eliminación a {}: {}", email, throwable.getMessage());
-                        return null;
-                    });
-
-            logger.info("Correo de eliminación reenviado exitosamente para usuario: {}", email);
+            logger.info("Correo de eliminación reenviado exitosamente para usuario: {}", uid);
             return ResponseEntity.ok("Correo de eliminación reenviado exitosamente");
 
         } catch (Exception e) {
-            logger.error("Error al reenviar correo de eliminación para usuario {}: {}", email, e.getMessage());
+            logger.error("Error al reenviar correo de eliminación para usuario {}: {}", uid, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al reenviar el correo de eliminación");
         }
     }
