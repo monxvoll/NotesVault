@@ -29,9 +29,9 @@ public class DeletionEmailService {
      * @return CompletableFuture que se completa cuando se envía el email
      */
 
-    public CompletableFuture<Void> sendAccountDeletionAsync(String email, String token, String userName) {
+    public CompletableFuture<Void> sendAccountDeletionAsync(String email, String token, String userName, String uid) {
         try {
-            String content = buildAccountDeletionEmailContent(email, token, userName);
+            String content = buildAccountDeletionEmailContent(email, token, userName, uid);
             return emailService.sendEmailAsync(email, "Confirmación de eliminación de cuenta – NotesVault", content)
                     .thenRun(() -> logger.info("Correo de eliminación de cuenta enviado exitosamente a: {}", email))
                     .exceptionally(throwable -> {
@@ -46,9 +46,9 @@ public class DeletionEmailService {
         }
     }
 
-    private String buildAccountDeletionEmailContent(String email, String token, String userName) {
+    private String buildAccountDeletionEmailContent(String email, String token, String userName, String uid) {
         String greeting = userName != null ? "Hola " + userName : "Hola";
-        String confirmationUrl = baseUrl + "delete-confirmation?token=" + token + "&email=" + email;
+        String confirmationUrl = baseUrl + "delete-confirmation?token=" + token + "&uid=" + uid;
         return String.format("""
                 %s,
 
