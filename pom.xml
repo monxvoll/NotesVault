@@ -84,6 +84,14 @@
             <artifactId>spring-security-crypto</artifactId>
             <version>6.4.4</version>
         </dependency>
+
+        <!-- With the following dependency, Spring will intercept all HTTPS requests-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
