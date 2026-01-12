@@ -25,7 +25,7 @@ public class AuthService {
         // Firebase Auth REST API endpoint to exchange credentials for an ID Token
         String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + apiKey;
 
-        // Contruct Request Body
+        // Construct Request Body
         Map<String, Object> body = new HashMap<>();
         body.put("email", request.getEmail());
         body.put("password", request.getPassword());
