@@ -38,3 +38,6 @@ app.elimination.base-url=**
 # Logging Config
 logging.level.com.notesvault=INFO
 logging.level.org.springframework.mail=DEBUG
+
+# Firebase Web API Key
+firebase.api.key=your_firebase_web_app_api_key_here
