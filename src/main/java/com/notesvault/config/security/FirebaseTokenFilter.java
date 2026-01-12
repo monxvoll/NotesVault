@@ -41,31 +41,45 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
         // Get the header "Authorization"
         String authHeader = request.getHeader("Authorization");
 
-        //Check that it has the correct format ("Bearer <token>")
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // delete first 7 characters (bearer) to get the clean token
-
-            try {
-                // Verify token with firebase (The Scanner")
-                FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
-                String uid = decodedToken.getUid();
-
-                // Create internal spring auth
-                // The user has this UID and no special roles or credentials for now
-                // Create temp user credential
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        uid, null, Collections.emptyList());
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Save authentication
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            } catch (FirebaseAuthException e) {
-                // If the token is false, we don't do anything, the user is still anonymous
-                logger.error("Error verificando token de Firebase: {}", e);
-            }
+        // Validate the presence and basic format of the Authorization header.
+        // If missing or not starting with "Bearer ", we treat the request as anonymous.
+        // This allows public endpoints (like /auth/login) to proceed without a token.
+        if (authHeader == null || !authHeader.startsWith("Bearer ") || authHeader.length() == 7) {
+            logger.warn("No Bearer authentication header detected. Proceeding as anonymous.");
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        // Extract and sanitize the token string by removing the "Bearer " prefix and trailing spaces.
+        // If the resulting token is empty, we halt the filter's execution for this request
+        String token = authHeader.substring(7).trim();
+        if (token.isEmpty()) {
+            logger.warn("Received empty or malformed Authorization header from: " + request.getRemoteAddr());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            // Verify token with firebase (The Scanner")
+            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
+            String uid = decodedToken.getUid();
+
+            // Create internal spring auth
+            // The user has this UID and no special roles or credentials for now
+            // Create temp user credential
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    uid, null, Collections.emptyList());
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            // Save authentication
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } catch (FirebaseAuthException e) {
+            // If the token is false, we don't do anything, the user is still anonymous
+            logger.error("Error verificando token de Firebase: {}", e);
+        }
+
 
         // Continue with chain filter
         filterChain.doFilter(request, response);
