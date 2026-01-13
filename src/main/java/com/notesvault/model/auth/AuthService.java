@@ -4,7 +4,10 @@ import com.notesvault.dtos.LoginRequestDTO;
 import com.notesvault.dtos.LoginResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,6 +20,7 @@ import java.util.Map;
  */
 @Service
 public class AuthService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${firebase.api.key}")
     private String apiKey;
@@ -49,9 +53,13 @@ public class AuthService {
 
             return new LoginResponseDTO(idToken, email, uid);
 
-        } catch (Exception e) {
-            // If email doesn't exist or wrong password
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de autenticación en Firebase: {}", e.getResponseBodyAsString());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
+
+        } catch (Exception e) {
+            logger.error("Error inesperado durante el login", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en login");
         }
     }
 }
