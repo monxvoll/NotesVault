@@ -65,6 +65,7 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 These diagrams illustrate the secure authentication flow implemented using **Spring Security** and **Firebase Auth**. It highlights how requests are intercepted to validate JWT tokens before reaching the protected endpoints.
 Simplified secure request flow:
 
+
 ### ✅ Authenticated Request Flow
 
 This diagram shows how a request with a valid token is processed:
@@ -110,4 +111,5 @@ sequenceDiagram
     
     Security--xClient:  403 Forbidden
 
+```
 ---
