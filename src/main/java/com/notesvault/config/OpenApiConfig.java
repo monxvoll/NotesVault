@@ -7,6 +7,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ *Global configuration of  OpenAPI to enable the button "Authorize" and JWT support on Swagger.
+ */
+
 @Configuration
 @OpenAPIDefinition(
         info = @Info(title = "NotesVault API", version = "1.0"),
