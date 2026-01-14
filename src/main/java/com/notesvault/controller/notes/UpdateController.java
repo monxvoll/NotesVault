@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/note")
@@ -19,7 +20,9 @@ public class UpdateController {
     }
 
     @PatchMapping("/update/{noteId}")
-    public ResponseEntity<?> UpdateNote(@PathVariable String noteId, @RequestBody NoteDTO noteDTO, @RequestParam String uid){
+    public ResponseEntity<?> UpdateNote(@PathVariable String noteId, @RequestBody NoteDTO noteDTO, Principal principal){
+        String uid = principal.getName();
+
         try{
             logger.info("Solicitud de actualizacion en la nota con id {} para el usuario {}", noteId, uid);
             updateService.updateNote(noteId,noteDTO,uid);

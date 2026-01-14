@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/note")
@@ -18,7 +19,9 @@ public class DeleteController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteNote(@RequestParam String uid,@RequestParam  String noteId) {
+    public ResponseEntity<String> deleteNote(@RequestParam  String noteId, Principal principal) {
+        String uid = principal.getName();
+
         logger.info("Solicitud de eliminacion para nota con ID: {}",noteId);
         try{
             deleteService.deleteNote(uid,noteId);
