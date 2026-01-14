@@ -25,10 +25,10 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - [x] Soft delete: notes and accounts are marked as inactive instead of permanently removed
 - [x] Modify authentication module with firestore built in functions
 - [X] Adapt crud methods to use the uid
-- [ ] Use token in the crud endpoints [In progress...]
+- [ ] Token-based authentication for all note-related operations (CRUD)  [In progress...]
+- [ ] Use token in the crud endpoints 
 - [ ] Encrypt notes content before storage
 - [ ] General Testing with github actions
-- [ ] Token-based authentication for all note-related operations (CRUD)  
 - [ ] Enhanced security measures (improved token handling, etc...)  
 - [ ] Advanced search and tagging system for notes  
 - [ ] Auto-save and real-time synchronization of notes across devices 
