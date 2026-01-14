@@ -60,7 +60,6 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 ## 🧪 Testing
  All endpoints have been tested using Postman and Swagger UI.
 
- ---
 
 ## 🏗️ Architecture & Security Flow
 These diagrams illustrate the secure authentication flow implemented using **Spring Security** and **Firebase Auth**. It highlights how requests are intercepted to validate JWT tokens before reaching the protected endpoints.
@@ -110,3 +109,5 @@ sequenceDiagram
     Note over Security: Protected Route + Anonymous User
     
     Security--xClient:  403 Forbidden
+
+---
