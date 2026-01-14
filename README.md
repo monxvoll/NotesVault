@@ -60,4 +60,53 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 ## 🧪 Testing
  All endpoints have been tested using Postman and Swagger UI.
 
----
+ ---
+
+## 🏗️ Architecture & Security Flow
+These diagrams illustrate the secure authentication flow implemented using **Spring Security** and **Firebase Auth**. It highlights how requests are intercepted to validate JWT tokens before reaching the protected endpoints.
+Simplified secure request flow:
+
+### ✅ Authenticated Request Flow
+
+This diagram shows how a request with a valid token is processed:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as  Client
+    participant Filter as  TokenFilter
+    participant Firebase as  Firebase
+    participant Controller as  Controller
+
+    Client->>Filter: HTTP Request (Token Bearer)
+    
+    Filter->>Firebase: Verify Token
+    Firebase-->>Filter: Token Valid (UID)
+    
+    Note over Filter: User Authenticated
+    
+    Filter->>Controller: Forward Request
+    Controller-->>Client: 200 OK / Data
+```
+### 🚫 Error/Unauthorized Request Flow
+
+When a request lacks a valid token or validation fails:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as  Client
+    participant Filter as  TokenFilter
+    participant Security as  Spring Security
+
+    Client->>Filter: HTTP Request (No Token / Invalid)
+    
+    Note over Filter: Validation Fails
+    
+    Filter-->>Security: Proceed as "Anonymous"
+    
+    Security->>Security: Check Route Rules
+    
+    Note over Security: Protected Route + Anonymous User
+    
+    Security--xClient:  403 Forbidden
