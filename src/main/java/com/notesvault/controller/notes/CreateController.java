@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/note")
@@ -20,7 +20,9 @@ public class CreateController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createNote(@RequestParam String uid, @RequestParam String title, @RequestParam String content){
+    public ResponseEntity<String> createNote(@RequestParam String title, @RequestParam String content, Principal principal){
+        String uid = principal.getName();
+
         logger.info("Solicitud de creacion de nota recibida para usuario: {}", uid);
         try {
             createService.createNote(uid, title, content);

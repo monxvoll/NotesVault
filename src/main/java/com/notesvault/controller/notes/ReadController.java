@@ -6,11 +6,11 @@ import com.notesvault.model.entities.Note;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -25,7 +25,9 @@ public class ReadController {
     }
 
     @GetMapping("/read")
-    public ResponseEntity<?> readNote(@RequestParam String uid){
+    public ResponseEntity<?> readNote(Principal principal){
+        String uid = principal.getName(); // Get uid from token
+
         try {
             List<Note> notes = readService.readNote(uid);
             logger.info("Solicitud de lectura para el usuario: {}",uid);
