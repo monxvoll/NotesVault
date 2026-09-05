@@ -27,15 +27,15 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 - [X] Adapt crud methods to use the uid
 - [X] JWT Token-based authentication for all note-related operations (CRUD)  
 - [X] Use token in the crud endpoints
-- [ ] General Code Cleanup & Housekeeping [In progress...] 
-- [ ] Encrypt notes content before storage using E2EE 
+- [x] Project Maintenance & Documentation Refactor
+- [ ] Encrypt notes content before storage using E2EE [Paused]
 - [ ] General Testing with github actions
 - [ ] Enhanced security measures (improved token handling, etc...)  
 - [ ] Advanced search and tagging system for notes  
 - [ ] Auto-save and real-time synchronization of notes across devices 
 - [ ] Image support: attach and manage images within notes
 - [ ] RESTful API fully documented and standardized  
-- [ ] Frontend design prototype in Figma  
+- [ ] Frontend implementation (Flutter)  
 - [ ] Additional improvements coming soon... 
 
 ##  API Endpoints 📡
@@ -63,54 +63,12 @@ NotesVault is a cloud-based application designed to manage notes efficiently and
 
 
 ## 🏗️ Architecture & Security Flow
-These diagrams illustrate the secure authentication flow implemented using **Spring Security** and **Firebase Auth**. It highlights how requests are intercepted to validate JWT tokens before reaching the protected endpoints.
-Simplified secure request flow:
 
+The project's diagrams have been moved to the `/docs` folder for better organization. You can view them here:
 
-### ✅ Authenticated Request Flow
+- [System Architecture](docs/architecture.md)
+- [Component Architecture](docs/components.md)
+- [Data Model](docs/data-model.md)
+- [Sequence Diagrams (Authentication Flow)](docs/sequence.md)
 
-This diagram shows how a request with a valid token is processed:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Client as  Client
-    participant Filter as  TokenFilter
-    participant Firebase as  Firebase
-    participant Controller as  Controller
-
-    Client->>Filter: HTTP Request (Token Bearer)
-    
-    Filter->>Firebase: Verify Token
-    Firebase-->>Filter: Token Valid (UID)
-    
-    Note over Filter: User Authenticated
-    
-    Filter->>Controller: Forward Request
-    Controller-->>Client: 200 OK / Data
-```
-### 🚫 Error/Unauthorized Request Flow
-
-When a request lacks a valid token or validation fails:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Client as  Client
-    participant Filter as  TokenFilter
-    participant Security as  Spring Security
-
-    Client->>Filter: HTTP Request (No Token / Invalid)
-    
-    Note over Filter: Validation Fails
-    
-    Filter-->>Security: Proceed as "Anonymous"
-    
-    Security->>Security: Check Route Rules
-    
-    Note over Security: Protected Route + Anonymous User
-    
-    Security--xClient:  403 Forbidden
-
-```
 ---
