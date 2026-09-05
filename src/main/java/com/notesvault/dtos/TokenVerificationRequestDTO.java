@@ -4,16 +4,16 @@ public class TokenVerificationRequestDTO {
     private String token;
     private String email;
 
-    // Constructor por defecto
+    // Default constructor
     public TokenVerificationRequestDTO() {}
 
-    // Constructor con parámetros
+    // Parameterized constructor
     public TokenVerificationRequestDTO(String token, String email) {
         this.token = token;
         this.email = email;
     }
 
-    // Getters y Setters
+    // Getters and Setters
     public String getToken() {
         return token;
     }

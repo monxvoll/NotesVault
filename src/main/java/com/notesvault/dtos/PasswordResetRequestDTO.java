@@ -5,17 +5,17 @@ public class PasswordResetRequestDTO {
     private String email;
     private String newPassword;
 
-    // Constructor por defecto
+    // Default constructor
     public PasswordResetRequestDTO() {}
 
-    // Constructor con parámetros
+    // Parameterized constructor
     public PasswordResetRequestDTO(String token, String email, String newPassword) {
         this.token = token;
         this.email = email;
         this.newPassword = newPassword;
     }
 
-    // Getters y Setters
+    // Getters and Setters
     public String getToken() {
         return token;
     }
