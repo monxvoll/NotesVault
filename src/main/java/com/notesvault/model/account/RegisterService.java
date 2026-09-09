@@ -14,9 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-@Service // Marca la clase como un servicio
+@Service // Marks the class as a service
 public class RegisterService {
-    //Logger para rastrear eventos y errores en la clase actual
+    // Logger to track events and errors in the current class
     private static final Logger logger = LoggerFactory.getLogger(RegisterService.class);
     private final Firestore firestore;
     private final ConfirmationEmailService confirmationEmailService;
@@ -31,13 +31,13 @@ public class RegisterService {
     }
 
     public void registerUser(RegisterRequestDTO request)  {
-        logger.info("Intentando registrar usuario: {}", request.getUserName());
+        logger.info("Attempting to register user: {}", request.getUserName());
         String email = request.getEmail();
         String password = request.getPassword();
 
         if (!validateEmail(email)) {
-            logger.warn("Intento de registro con correo inválido");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo electrónico invalido");
+            logger.warn("Registration attempt with invalid email");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid email address");
         }
 
         try{
@@ -49,31 +49,31 @@ public class RegisterService {
             //Calling of firebase to create the user (sdk firebase object)
             UserRecord userRecord = firebaseAuth.createUser(createRequest);
             String uid = userRecord.getUid();
-            logger.info("Usuario creado exitosamente en Firebase Auth con UID: {}",uid);
+            logger.info("User successfully created in Firebase Auth with UID: {}",uid);
 
             //Saving aditional information of the user in firestore
             User userProfile = new User(uid, email, request.getUserName());
             firestore.collection("users").document(uid).set(userProfile);
-            logger.info("Perfil de usuario guardado en Firestore para UID: {}", uid);
+            logger.info("User profile saved in Firestore for UID: {}", uid);
 
             //Send confirmation email
             TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(uid, "confirmation");
             confirmationEmailService.sendConfirmationEmailAsync(uid,email, tokenInfo.getRawToken(), request.getUserName())
                     .exceptionally(throwable -> {
-                        logger.error("Error al enviar correo de confirmación a {}: {}", uid, throwable.getMessage());
+                        logger.error("Error sending confirmation email to {}: {}", uid, throwable.getMessage());
                         return null;
                     });
 
-            logger.info("Proceso de registro para {} completado.", uid);
+            logger.info("Registration process for {} completed.", uid);
 
         } catch (IllegalArgumentException e) {
             // If the password is invalid before calling firestore
-            logger.error("Error de validación del SDK de Firebase: {}", e.getMessage());
-            String publicMessage = "La contraseña es inválida. Debe tener al menos 8 caracteres.";
+            logger.error("Firebase SDK validation error: {}", e.getMessage());
+            String publicMessage = "The password is invalid. It must have at least 8 characters.";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, publicMessage);
 
         } catch (FirebaseAuthException e) {
-            logger.error("Error de Firebase al registrar a {}:", request.getUserName(), e);
+            logger.error("Firebase error registering {}:", request.getUserName(), e);
 
             String publicMessage;
             HttpStatus status;
@@ -84,11 +84,11 @@ public class RegisterService {
                 // Handle SDK  exceptions
                 switch (errorCode) {
                     case EMAIL_ALREADY_EXISTS:
-                        publicMessage = "Este email ya se encuentra registrado.";
+                        publicMessage = "This email is already registered.";
                         status = HttpStatus.CONFLICT;
                         break;
                     default:
-                        publicMessage = "Error interno al registrar el usuario.";
+                        publicMessage = "Internal error registering the user.";
                         status = HttpStatus.INTERNAL_SERVER_ERROR;
                         break;
                 }
@@ -97,10 +97,10 @@ public class RegisterService {
                 String errorMessage = (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
 
                 if (errorMessage != null && errorMessage.contains("PASSWORD_DOES_NOT_MEET_REQUIREMENTS")) {
-                    publicMessage = "La contraseña no cumple los requisitos (mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo).";
+                    publicMessage = "The password does not meet the requirements (minimum 8 characters, one uppercase, one lowercase, one number, and one symbol).";
                     status = HttpStatus.BAD_REQUEST;
                 } else {
-                    publicMessage = "Error desconocido al registrar el usuario.";
+                    publicMessage = "Unknown error registering the user.";
                     status = HttpStatus.INTERNAL_SERVER_ERROR;
                 }
             }

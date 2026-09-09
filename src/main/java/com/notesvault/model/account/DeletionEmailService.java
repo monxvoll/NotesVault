@@ -21,25 +21,25 @@ public class DeletionEmailService {
     }
 
     /**
-     * Enviamos un correo de confimación de eliminacion (cuenta) de forma asincrona)
+     * Asynchronously sends an account deletion confirmation email
      *
-     * @param email    Email del destinatario
-     * @param token    Token de confirmación generado
-     * @param userName Nombre del usuario
-     * @return CompletableFuture que se completa cuando se envía el email
+     * @param email    Recipient's email
+     * @param token    Generated confirmation token
+     * @param userName User's name
+     * @return CompletableFuture that completes when the email is sent
      */
 
     public CompletableFuture<Void> sendAccountDeletionAsync(String email, String token, String userName, String uid) {
         try {
             String content = buildAccountDeletionEmailContent(email, token, userName, uid);
-            return emailService.sendEmailAsync(email, "Confirmación de eliminación de cuenta – NotesVault", content)
-                    .thenRun(() -> logger.info("Correo de eliminación de cuenta enviado exitosamente a: {}", email))
+            return emailService.sendEmailAsync(email, "Account Deletion Confirmation – NotesVault", content)
+                    .thenRun(() -> logger.info("Account deletion email sent successfully to: {}", email))
                     .exceptionally(throwable -> {
-                        logger.error("Error al enviar correo de  eliminación de cuenta a {}: {}", email, throwable.getMessage());
+                        logger.error("Error sending account deletion email to {}: {}", email, throwable.getMessage());
                         return null;
                     });
         } catch (Exception e) {
-            logger.error("Error al preparar el correo de eliminacion de cuenta para {}: {}", email, e.getMessage());
+            logger.error("Error preparing account deletion email for {}: {}", email, e.getMessage());
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
@@ -47,14 +47,14 @@ public class DeletionEmailService {
     }
 
     private String buildAccountDeletionEmailContent(String email, String token, String userName, String uid) {
-        String greeting = userName != null ? "Hola " + userName : "Hola";
+        String greeting = userName != null ? "Hello " + userName : "Hello";
         String confirmationUrl = baseUrl + "delete-confirmation?token=" + token + "&uid=" + uid;
         return String.format("""
                 %s,
 
-                Has solicitado eliminar tu cuenta en NotesVault.
+                You have requested to delete your NotesVault account.
 
-                Para continuar con el proceso de eliminación, haz clic en el siguiente enlace:
+                To continue with the deletion process, click the following link:
                 %s
                     """, greeting, confirmationUrl);
     }

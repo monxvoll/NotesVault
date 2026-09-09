@@ -24,9 +24,9 @@ public class ReadService {
 
     public List<Note> readNote(String uid){
         try {
-            logger.info("Intentando leer notas del usuario {}", uid);
+            logger.info("Attempting to read notes for user {}", uid);
 
-            //Referencia a la coleccion de notas
+            // Reference to the notes collection
             CollectionReference notesRef = firestore.collection("users").document(uid).collection("notesList");
 
             ApiFuture<QuerySnapshot> future = notesRef.whereEqualTo("active", true).get();
@@ -34,8 +34,8 @@ public class ReadService {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
             if (documents.isEmpty()) {
-                logger.warn("Intento de traer notas, no realizado para: {}", uid);
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay notas disponibles");
+                logger.warn("Attempt to fetch notes failed for: {}", uid);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No notes available");
             }
 
             List<Note> noteList = new ArrayList<>();
@@ -44,12 +44,12 @@ public class ReadService {
                 noteList.add(note);
             }
 
-            logger.info("Notas consultadas con exito para usuario {}", uid);
+            logger.info("Notes successfully queried for user {}", uid);
             return noteList;
         } catch (InterruptedException | ExecutionException e){
-            logger.error("Error al procesar la consulta de notas para usuario {}: {}", uid, e.getMessage());
+            logger.error("Error processing notes query for user {}: {}", uid, e.getMessage());
             Thread.currentThread().interrupt();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al consultar las notas", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error querying notes", e);
         }
     }
 

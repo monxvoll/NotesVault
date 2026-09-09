@@ -36,23 +36,24 @@ public class ConfirmationEmailService {
     }
 
     /**
-     * Envía un correo de confirmación de forma asíncrona
-     * @param email Email del destinatario
-     * @param token Token de confirmación generado
-     * @param userName Nombre del usuario
-     * @return CompletableFuture que se completa cuando se envía el email
+     * Asynchronously sends a confirmation email
+     * @param uid User's uid
+     * @param email Recipient's email
+     * @param token Generated confirmation token
+     * @param userName User's name
+     * @return CompletableFuture that completes when the email is sent
      */
     public CompletableFuture<Void> sendConfirmationEmailAsync(String uid, String email, String token, String userName) {
         try {
             String content = buildConfirmationEmailContent(uid, token, userName);
-            return emailService.sendEmailAsync(email, "Confirmación de Cuenta - NotesVault", content)
-                .thenRun(() -> logger.info("Correo de confirmación enviado exitosamente a: {}", uid))
+            return emailService.sendEmailAsync(email, "Account Confirmation - NotesVault", content)
+                .thenRun(() -> logger.info("Confirmation email sent successfully to: {}", uid))
                 .exceptionally(throwable -> {
-                    logger.error("Error al enviar correo de confirmación a {}: {}", uid, throwable.getMessage());
+                    logger.error("Error sending confirmation email to {}: {}", uid, throwable.getMessage());
                     return null;
                 });
         } catch (Exception e) {
-            logger.error("Error al preparar correo de confirmación para {}: {}", uid, e.getMessage());
+            logger.error("Error preparing confirmation email for {}: {}", uid, e.getMessage());
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
@@ -60,58 +61,58 @@ public class ConfirmationEmailService {
     }
 
     public String buildConfirmationEmailContent(String uid, String token, String userName){
-        String greeting = userName != null ? "Hola " + userName : "Hola";
+        String greeting = userName != null ? "Hello " + userName : "Hello";
         String confirmationUrl = baseUrl + "confirm?token=" + token + "&uid=" + uid;
         return String.format("""
             %s,
 
-            Has solicitado confirmar tu cuenta en NotesVault.
+            You have requested to confirm your NotesVault account.
 
-            Para continuar con el proceso de confirmación, haz clic en el siguiente enlace:
+            To continue the confirmation process, click on the following link:
             %s
                 """, greeting, confirmationUrl);
     }
 
     public boolean confirmAccount(String token, String uid){
-        logger.info("Iniciando confirmación de cuenta para usuario: {}", uid);
+        logger.info("Starting account confirmation for user: {}", uid);
         
         try{
-            // Verificar y consumir el token (lo elimina automáticamente si es válido)
+            // Verify and consume the token (automatically deletes if valid)
             boolean isTokenValid = tokenService.verifyAndConsumeToken(token, uid, "confirmation");
             
             if(isTokenValid){
-                logger.info("Token válido y consumido para usuario: {}", uid);
+                logger.info("Token valid and consumed for user: {}", uid);
                 
-                // Actualizar el estado isConfirmed del usuario en Firestore
+                // Update the user's isConfirmed state in Firestore
                 boolean updateSuccess = updateUserConfirmationStatus(uid);
                 if (updateSuccess) {
-                    logger.info("Cuenta confirmada exitosamente para el usuario: {}", uid);
+                    logger.info("Account successfully confirmed for user: {}", uid);
                     
-                    // Eliminar cualquier token adicional de confirmación de forma asíncrona
+                    // Asynchronously delete any additional confirmation tokens
                     CompletableFuture.runAsync(() -> {
                         try {
                             boolean deleted = tokenService.deleteAllTokensForUser(uid, "confirmation");
                             if (deleted) {
-                                logger.info("Tokens adicionales de confirmación eliminados para usuario: {}", uid);
+                                logger.info("Additional confirmation tokens deleted for user: {}", uid);
                             } else {
-                                logger.debug("No se encontraron tokens adicionales de confirmación para eliminar para usuario: {}", uid);
+                                logger.debug("No additional confirmation tokens found to delete for user: {}", uid);
                             }
                         } catch (Exception e) {
-                            logger.error("Error al eliminar tokens adicionales de confirmación para usuario {}: {}", uid, e.getMessage());
+                            logger.error("Error deleting additional confirmation tokens for user {}: {}", uid, e.getMessage());
                         }
                     }, cleanupTaskExecutor);
                     
                     return true;
                 } else {
-                    logger.error("Error al actualizar el estado de confirmación para el usuario: {}", uid);
+                    logger.error("Error updating confirmation state for user: {}", uid);
                     return false;
                 }
             } else {
-                logger.warn("Token inválido o ya consumido para confirmación de cuenta: {}", uid);
+                logger.warn("Invalid or already consumed token for account confirmation: {}", uid);
                 return false;
             }
         }catch(Exception e){
-            logger.error("Error al confirmar la cuenta para el usuario {}: {}", uid, e.getMessage());
+            logger.error("Error confirming account for user {}: {}", uid, e.getMessage());
             return false;
         }
     }
@@ -126,11 +127,11 @@ public class ConfirmationEmailService {
                     .update(updates);
 
             WriteResult result = future.get();
-            logger.info("Estado de confirmación actualizado exitosamente para el usuario {} en: {}", 
+            logger.info("Confirmation state updated successfully for user {} at: {}", 
                        uid, result.getUpdateTime());
             return true;
         } catch (InterruptedException | ExecutionException e) {
-            logger.error("Error al actualizar el estado de confirmación en Firestore para el usuario {}: {}", 
+            logger.error("Error updating confirmation state in Firestore for user {}: {}", 
                         uid, e.getMessage(), e);
             Thread.currentThread().interrupt();
             return false;
@@ -138,9 +139,9 @@ public class ConfirmationEmailService {
     }
 
     /**
-     * Verifica si un usuario ya está confirmado
-     * @param uid uid del usuario
-     * @return true si el usuario está confirmado, false en caso contrario
+     * Verifies if a user is already confirmed
+     * @param uid user's uid
+     * @return true if the user is confirmed, false otherwise
      */
     public boolean isUserConfirmed(String uid) {
         try {
@@ -149,7 +150,7 @@ public class ConfirmationEmailService {
             
             com.google.cloud.firestore.DocumentSnapshot document = future.get();
             if (!document.exists()) {
-                logger.warn("Usuario no encontrado: {}", uid);
+                logger.warn("User not found: {}", uid);
                 return false;
             }
             
@@ -157,7 +158,7 @@ public class ConfirmationEmailService {
             return isConfirmed != null && isConfirmed;
             
         } catch (Exception e) {
-            logger.error("Error al verificar estado de confirmación para usuario {}: {}", uid, e.getMessage());
+            logger.error("Error verifying confirmation state for user {}: {}", uid, e.getMessage());
             return false;
         }
     }

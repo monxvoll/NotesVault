@@ -27,22 +27,22 @@ public class UpdateService {
     public void updateNote(String noteId, NoteDTO noteDTO, String uid) {
         Map<String, Object> updates = new HashMap<>();
         try {
-            logger.info("Intentando actualizar nota con id {} de usuario {}", noteId, uid);
+            logger.info("Attempting to update note with id {} for user {}", noteId, uid);
 
             DocumentReference noteRef = firestore.collection("users").document(uid).collection("notesList").document(noteId);
             //Read Document
             DocumentSnapshot document = noteRef.get().get();
 
             if (!document.exists()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La nota no existe");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The note does not exist");
             }
 
             Boolean isActive = document.getBoolean("active");
 
 
             if (isActive == null || !isActive) {
-                logger.warn("Intento de actualizar nota inactiva: {}", noteId);
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La nota no se encuentra disponible");
+                logger.warn("Attempt to update inactive note: {}", noteId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The note is not available");
             }
 
             if(noteDTO.getTitle()!=null) updates.put("title",noteDTO.getTitle());
@@ -55,11 +55,11 @@ public class UpdateService {
 
 
             noteRef.update(updates).get();
-            logger.info("Nota actualizada correctamente");
+            logger.info("Note updated successfully");
 
         }catch (ExecutionException | InterruptedException e) {
-            logger.error("Error inesperado al intentar al actualizacion de la nota {} para el usuario {}: {}",noteId,uid, e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al intentar actualizar nota");
+            logger.error("Unexpected error attempting to update note {} for user {}: {}",noteId,uid, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error attempting to update note");
         }
     }
 }

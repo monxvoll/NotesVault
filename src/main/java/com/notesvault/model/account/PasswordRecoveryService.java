@@ -31,121 +31,121 @@ public class PasswordRecoveryService {
     }
 
     public void generateRecoveryToken (String email) throws UserNotFoundException {
-        //Validacion basica de vacio, esto se debe tomar en cuenta en el front tambien
+        // Basic empty validation, this should be considered in the frontend too
         if(email == null || email.isEmpty()){
-            log.warn("Intento de recuperacion con email vacio");
-            throw new UserNotFoundException("El email es obligatorio");
+            log.warn("Recovery attempt with empty email");
+            throw new UserNotFoundException("Email is required");
         }
 
         try {
-            //Justo aca verificamos si el email esta dentro de nuestros usuarios
+            // Here we verify if the email is within our users
             ApiFuture<DocumentSnapshot> future = firestore.collection("users").document(email).get();
             DocumentSnapshot document = future.get();
 
             if(!document.exists()){
-                log.warn("Email no encontrado en la recuperacion de contrasena {}", email);
-                throw new UserNotFoundException("Tenemos un error, por favor verifica la credencial");
+                log.warn("Email not found during password recovery {}", email);
+                throw new UserNotFoundException("There is an error, please verify the credential");
             }
 
-            //Verifico tambien que el usuario este activo en el sistema
+            // Also verify that the user is active in the system
             Boolean isActive = document.getBoolean("isActive");
             if (isActive == null || !isActive) {
-                log.warn("Intento de recuperación en cuenta desactivada: {}", email);
-                throw new UserNotFoundException("La cuenta se encuentra desactivada");
+                log.warn("Recovery attempt on deactivated account: {}", email);
+                throw new UserNotFoundException("The account is deactivated");
             }
 
-            log.info("Generando token de recuperación para: {}", email);
+            log.info("Generating recovery token for: {}", email);
 
-            // Generar token único
+            // Generate unique token
             TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(email, "recovery");
-            log.info("Token generado y almacenado para {}. Token crudo inicia con: {}", email,
+            log.info("Token generated and stored for {}. Raw token starts with: {}", email,
                     tokenInfo.getRawToken().substring(0, Math.min(tokenInfo.getRawToken().length(), 8)) + "...");
 
-            // Obtener el nombre del usuario si está disponible
+            // Get the username if available
             String userName = document.getString("userName");
             
-            // Enviar correo de recuperación de forma asíncrona (no bloquea la respuesta)
+            // Send recovery email asynchronously (does not block response)
             emailService.sendPasswordRecoveryEmailAsync(email, tokenInfo.getRawToken(), userName)
                 .exceptionally(throwable -> {
-                    log.error("Error al enviar correo de recuperación a {}: {}", email, throwable.getMessage());
+                    log.error("Error sending recovery email to {}: {}", email, throwable.getMessage());
                     return null;
                 });
 
         }catch (InterruptedException e) {
-            log.error("Error al verificar usuario en Firestore: {}", e.getMessage());
+            log.error("Error verifying user in Firestore: {}", e.getMessage());
             Thread.currentThread().interrupt();
-            throw new UserNotFoundException("Error al verificar el usuario");
+            throw new UserNotFoundException("Error verifying user");
         } catch (ExecutionException e) {
-            log.error("Error en la ejecución al verificar el usuario: {}", e.getMessage());
-            throw new UserNotFoundException("Error al verificar el usuario");
+            log.error("Execution error verifying user: {}", e.getMessage());
+            throw new UserNotFoundException("Error verifying user");
         }
     }
 
     /**
-     * Verifica si un token de recuperación es válido
-     * @param token Token de recuperación
-     * @param email Email del usuario
-     * @return true si el token es válido, false en caso contrario
+     * Verifies if a recovery token is valid
+     * @param token Recovery token
+     * @param email User email
+     * @return true if valid, false otherwise
      */
     public boolean verifyRecoveryToken(String token, String email) {
         if (token == null || token.trim().isEmpty() || email == null || email.trim().isEmpty()) {
-            log.warn("Token o email vacío en verificación");
+            log.warn("Empty token or email in verification");
             return false;
         }
 
         try {
             return tokenService.verifyToken(token, email, "recovery");
         } catch (Exception e) {
-            log.error("Error al verificar token: {}", e.getMessage());
+            log.error("Error verifying token: {}", e.getMessage());
             return false;
         }
     }
 
     /**
-     * Cambia la contraseña del usuario usando un token de recuperación válido
-     * @param token Token de recuperación
-     * @param email Email del usuario
-     * @param newPassword Nueva contraseña
-     * @return true si se cambió exitosamente, false en caso contrario
+     * Changes the user's password using a valid recovery token
+     * @param token Recovery token
+     * @param email User email
+     * @param newPassword New password
+     * @return true if changed successfully, false otherwise
      */
     public boolean changePasswordWithToken(String token, String email, String newPassword) {
-        log.info("Iniciando cambio de contraseña para usuario: {}", email);
+        log.info("Starting password change for user: {}", email);
         
-        // Verificar y consumir el token (lo elimina automáticamente si es válido)
+        // Verify and consume the token (automatically deletes if valid)
         if (!tokenService.verifyAndConsumeToken(token, email, "recovery")) {
-            log.warn("Token inválido o ya consumido para cambio de contraseña: {}", email);
+            log.warn("Invalid or already consumed token for password change: {}", email);
             return false;
         }
 
         try {
-            // Hash de la nueva contraseña
+            // Hash the new password
             String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
             
-            // Actualizar contraseña en Firestore
+            // Update password in Firestore
             ApiFuture<com.google.cloud.firestore.WriteResult> future = 
                 firestore.collection("users").document(email).update("password", hashedPassword);
             
-            future.get(); // Esperar a que se complete la actualización
+            future.get(); // Wait for the update to complete
 
-            // Eliminar cualquier token adicional que pueda existir para este usuario de forma asíncrona
+            // Asynchronously delete any additional tokens for this user
             CompletableFuture.runAsync(() -> {
                 try {
                     boolean deleted = tokenService.deleteAllTokensForUser(email, "recovery");
                     if (deleted) {
-                        log.info("Tokens adicionales eliminados para usuario: {}", email);
+                        log.info("Additional tokens deleted for user: {}", email);
                     } else {
-                        log.debug("No se encontraron tokens adicionales para eliminar para usuario: {}", email);
+                        log.debug("No additional tokens found to delete for user: {}", email);
                     }
                 } catch (Exception e) {
-                    log.error("Error al eliminar tokens adicionales para usuario {}: {}", email, e.getMessage());
+                    log.error("Error deleting additional tokens for user {}: {}", email, e.getMessage());
                 }
             }, cleanupTaskExecutor);
 
-            log.info("Contraseña cambiada exitosamente para usuario: {}", email);
+            log.info("Password successfully changed for user: {}", email);
             return true;
 
         } catch (Exception e) {
-            log.error("Error al cambiar contraseña para usuario {}: {}", email, e.getMessage());
+            log.error("Error changing password for user {}: {}", email, e.getMessage());
             return false;
         }
     }

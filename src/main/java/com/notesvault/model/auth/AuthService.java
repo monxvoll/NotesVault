@@ -43,7 +43,7 @@ public class AuthService {
             Map<String, Object> response = restTemplate.postForObject(url, body, Map.class);
 
             if (response == null) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al comunicar con Firebase");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error communicating with Firebase");
             }
 
             // Extract data given by google
@@ -54,12 +54,12 @@ public class AuthService {
             return new LoginResponseDTO(idToken, email, uid);
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de autenticación en Firebase: {}", e.getResponseBodyAsString());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
+            logger.error("Firebase authentication error: {}", e.getResponseBodyAsString());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
 
         } catch (Exception e) {
-            logger.error("Error inesperado durante el login", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en login");
+            logger.error("Unexpected error during login", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal login error");
         }
     }
 }

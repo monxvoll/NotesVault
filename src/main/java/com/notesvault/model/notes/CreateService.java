@@ -24,10 +24,10 @@ public class CreateService {
 
     public void createNote(String uid, String title, String content){
         if (validateNotEmpty(title, content)) {
-            logger.info("Iniciando creación de nota para usuario: {}", uid);
+            logger.info("Starting note creation for user: {}", uid);
 
             LocalDateTime localDateTime = LocalDateTime.now();
-            String exclusiveId = UUID.randomUUID().toString();   //Genera un ID unico utilizando UUID y lo convierte a String
+            String exclusiveId = UUID.randomUUID().toString();   // Generate a unique ID using UUID and convert it to String
             boolean isActive = true;
             DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             String date = localDateTime.format(format);
@@ -44,24 +44,24 @@ public class CreateService {
             ApiFuture<WriteResult> future = notesRef.document(note.getId()).set(note);
             WriteResult result = future.get();
 
-            logger.info("Nota guardada exitosamente en Firestore en: {}", result.getUpdateTime());
+            logger.info("Note saved successfully in Firestore at: {}", result.getUpdateTime());
 
         } catch (InterruptedException e) {
-            logger.error("Error al guardar la nota (interrupción del hilo): {}", e.getMessage());
+            logger.error("Error saving note (thread interrupted): {}", e.getMessage());
             Thread.currentThread().interrupt();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al guardar la nota: interrupción del hilo",e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error saving note: thread interrupted",e);
         } catch (ExecutionException e) {
-            logger.error("Error al guardar la nota en Firestore: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al guardar la nota en Firestore",e);
+            logger.error("Error saving note in Firestore: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error saving note in Firestore",e);
         } catch (Exception e) {
-            logger.error("Error inesperado: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error inesperado al guardar la nota",e);
+            logger.error("Unexpected error: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Unexpected error saving note",e);
         }
     }
 
     public boolean validateNotEmpty(String title, String content) {
         if (title == null || title.isEmpty() || content == null || content.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Por favor, digite un campo válido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide a valid field");
         }
         return true;
     }

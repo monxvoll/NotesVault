@@ -20,37 +20,37 @@ public class DeleteService {
 
     public void deleteNote(String uid, String noteId) {
         try {
-            logger.info("Intentando eliminar la nota con ID {} para el usuario {}", noteId, uid);
+            logger.info("Attempting to delete note with ID {} for user {}", noteId, uid);
 
-            // Referencia a la nota
+            // Reference to the note
             DocumentReference noteRef = firestore.collection("users").document(uid).collection("notesList").document(noteId);
 
-            // Verificamos si la nota existe
+            // Verify if the note exists
             ApiFuture<DocumentSnapshot> future = noteRef.get();
             DocumentSnapshot document = future.get();
 
             if (!document.exists()) {
-                logger.warn("Intento de eliminar una nota inexistente: {}", noteId);
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La nota no existe");
+                logger.warn("Attempt to delete a non-existent note: {}", noteId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The note does not exist");
             }
 
-            // Se marca la nota como inactiva en lugar de eliminarla
+            // Mark the note as inactive instead of deleting it
             ApiFuture<WriteResult> updateFuture = noteRef.update(
                     "active", false,
                     "deletedAt", FieldValue.serverTimestamp()
             );
             updateFuture.get();
 
-            logger.info("Nota con ID {} marcada como inactiva correctamente.", noteId);
+            logger.info("Note with ID {} marked as inactive successfully.", noteId);
 
         } catch (InterruptedException e) {
-            logger.error("Error al marcar como inactiva la nota (interrupción del hilo): {}", e.getMessage(), e);
+            logger.error("Error marking the note as inactive (thread interruption): {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar la nota", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error deleting note", e);
 
         } catch (ExecutionException e) {
-            logger.error("Error en la base de datos al eliminar la nota: {}", e.getCause().getMessage(), e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en la base de datos", e);
+            logger.error("Database error deleting note: {}", e.getCause().getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Database error", e);
         }
     }
 }

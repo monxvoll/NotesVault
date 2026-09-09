@@ -40,15 +40,15 @@ public class TokenService {
     }
 
     /**
-     * Genera un token seguro para el usuario
-     * @param uid uid del usuario
-     * @param type Tipo de token (confirmation, recovery)
-     * @return Información del token generado
+     * Generates a secure token for the user
+     * @param uid user's uid
+     * @param type Token type (confirmation, recovery)
+     * @return Generated token info
      */
     public GeneratedTokenInfo generateSecureToken(String uid, String type) {
         if (uid == null || uid.trim().isEmpty()) {
-            logger.warn("Intento generar token sin uid");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El uid del usuario es obligatorio para generar el token");
+            logger.warn("Attempt to generate token without uid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User uid is required to generate the token");
         }
 
         byte[] randomBytes = new byte[TOKEN_BYTE_LENGTH];
@@ -59,7 +59,7 @@ public class TokenService {
 
         String hashedToken = BCrypt.hashpw(rawToken, BCrypt.gensalt());
         
-        // Generar un ID único para el documento
+        // Generate a unique ID for the document
         String documentId = UUID.randomUUID().toString();
 
         Map<String, Object> tokenData = new HashMap<>();
@@ -69,30 +69,30 @@ public class TokenService {
         tokenData.put("hashedToken", hashedToken);
         tokenData.put("type", type);
 
-        logger.info("Almacenando token hasheado en Firestore para usuario: {}", uid);
+        logger.info("Storing hashed token in Firestore for user: {}", uid);
 
         ApiFuture<WriteResult> writeResultFuture = firestore.collection("activeTokens").document(documentId).set(tokenData);
 
         try {
             WriteResult writeResult = writeResultFuture.get();
-            logger.info("Token hasheado almacenado con éxito para usuario {} (UpdateTime: {})", uid, writeResult.getUpdateTime());
+            logger.info("Hashed token successfully stored for user {} (UpdateTime: {})", uid, writeResult.getUpdateTime());
         } catch (InterruptedException e) {
-            logger.error("Interrupción durante la escritura del token en Firestore para {}: {}", uid, e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al almacenar el token", e);
+            logger.error("Interruption while writing token in Firestore for {}: {}", uid, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error storing the token", e);
         } catch (ExecutionException e) {
-            logger.error("Error de ejecución durante la escritura del token en Firestore para {}: {}", uid, e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al almacenar el token", e);
+            logger.error("Execution error while writing token in Firestore for {}: {}", uid, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error storing the token", e);
         }
 
         return new GeneratedTokenInfo(rawToken, hashedToken, expirationTime, documentId);
     }
 
     /**
-     * Verifica si un token es válido para un usuario y tipo específico
-     * @param token Token a verificar
-     * @param uid uid del usuario
-     * @param type Tipo de token (confirmation, recovery)
-     * @return true si el token es válido, false en caso contrario
+     * Verifies if a token is valid for a user and specific type
+     * @param token Token to verify
+     * @param uid User's uid
+     * @param type Token type (confirmation, recovery)
+     * @return true if valid, false otherwise
      */
     public boolean verifyToken(String token, String uid, String type){
         try{
@@ -106,7 +106,7 @@ public class TokenService {
             List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
             if (documents.isEmpty()) {
-                logger.warn("No se encontraron tokens activos para el uid: {}", uid);
+                logger.warn("No active tokens found for uid: {}", uid);
                 return false;
             }
 
@@ -116,34 +116,34 @@ public class TokenService {
             if (BCrypt.checkpw(token, hashedToken)) {
                 Timestamp expirationTimestamp = document.getTimestamp("expirationTime");
                 if (expirationTimestamp == null) {
-                    logger.warn("Token sin timestamp de expiración para usuario: {}",uid);
+                    logger.warn("Token without expiration timestamp for user: {}",uid);
                     return false;
                 }
                 Instant expirationTime = expirationTimestamp.toDate().toInstant();
                 if (Instant.now().isAfter(expirationTime)) {
-                    logger.warn("Token expirado para usuario: {}", uid);
+                    logger.warn("Expired token for user: {}", uid);
                     firestore.collection("activeTokens").document(document.getId()).delete();
                     return false;
                 }
 
-                logger.info("Token verificado exitosamente para usuario: {}", uid);
+                logger.info("Token successfully verified for user: {}", uid);
                 return true;
             }
 
-            logger.warn("Token no válido para el email: {}", uid);
+            logger.warn("Invalid token for email: {}", uid);
             return false;
         } catch (Exception e) {
-            logger.error("Error al verificar token", e);
+            logger.error("Error verifying token", e);
             return false;
         }
     }
 
     /**
-     * Verifica y consume un token (lo elimina después de verificar)
-     * @param token Token a verificar
-     * @param uid uid del usuario
-     * @param type Tipo de token (confirmation, recovery)
-     * @return true si el token es válido y fue consumido, false en caso contrario
+     * Verifies and consumes a token (deletes it after verification)
+     * @param token Token to verify
+     * @param uid user's uid
+     * @param type Token type (confirmation, recovery)
+     * @return true if token is valid and consumed, false otherwise
      */
     public boolean  verifyAndConsumeToken(String token, String uid, String type){
         try{
@@ -157,7 +157,7 @@ public class TokenService {
             List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
             if (documents.isEmpty()) {
-                logger.warn("No se encontraron tokens activos para el usuario: {}", uid);
+                logger.warn("No active tokens found for user: {}", uid);
                 return false;
             }
 
@@ -167,35 +167,35 @@ public class TokenService {
             if (BCrypt.checkpw(token, hashedToken)) {
                 Timestamp expirationTimestamp = document.getTimestamp("expirationTime");
                 if (expirationTimestamp == null) {
-                    logger.warn("Token sin timestamp de expiración para usuario: {}", uid);
+                    logger.warn("Token without expiration timestamp for user: {}", uid);
                     return false;
                 }
                 Instant expirationTime = expirationTimestamp.toDate().toInstant();
                 if (Instant.now().isAfter(expirationTime)) {
-                    logger.warn("Token expirado para usuario: {}", uid);
+                    logger.warn("Expired token for user: {}", uid);
                     firestore.collection("activeTokens").document(document.getId()).delete();
                     return false;
                 }
 
-                // Token válido - eliminarlo después de verificar
+                // Valid token - delete it after verification
                 firestore.collection("activeTokens").document(document.getId()).delete();
-                logger.info("Token verificado y consumido exitosamente para usuario: {}", uid);
+                logger.info("Token successfully verified and consumed for user: {}", uid);
                 return true;
             }
 
-            logger.warn("Token no válido para el usuario: {}", uid);
+            logger.warn("Invalid token for user: {}", uid);
             return false;
         } catch (Exception e) {
-            logger.error("Error al verificar y consumir token", e);
+            logger.error("Error verifying and consuming token", e);
             return false;
         }
     }
 
     /**
-     * Elimina todos los tokens activos para un usuario específico
-     * @param uid uid del usuario
-     * @param type Tipo de token (confirmation, recovery)
-     * @return true si se eliminaron tokens, false en caso contrario
+     * Deletes all active tokens for a specific user
+     * @param uid user's uid
+     * @param type Token type (confirmation, recovery)
+     * @return true if tokens were deleted, false otherwise
      */
     public boolean deleteAllTokensForUser(String uid, String type) {
         try {
@@ -212,11 +212,11 @@ public class TokenService {
                 deletedCount++;
             }
             
-            logger.info("Eliminados {} tokens para usuario: {} (tipo: {})", deletedCount, uid, type);
+            logger.info("Deleted {} tokens for user: {} (type: {})", deletedCount, uid, type);
             return deletedCount > 0;
             
         } catch (Exception e) {
-            logger.error("Error al eliminar tokens para usuario {}: {}", uid, e.getMessage());
+            logger.error("Error deleting tokens for user {}: {}", uid, e.getMessage());
             return false;
         }
     }
@@ -266,9 +266,9 @@ public class TokenService {
                 deletedCount++;
             }
             
-            logger.info("Eliminados {} tokens expirados", deletedCount);
+            logger.info("Deleted {} expired tokens", deletedCount);
         } catch (Exception e) {
-            logger.error("Error al limpiar tokens expirados", e);
+            logger.error("Error cleaning expired tokens", e);
         }
     }
 }
