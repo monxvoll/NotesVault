@@ -23,13 +23,13 @@ public class CreateController {
     public ResponseEntity<String> createNote(@RequestParam String title, @RequestParam String content, Principal principal){
         String uid = principal.getName();
 
-        logger.info("Solicitud de creacion de nota recibida para usuario: {}", uid);
+        logger.info("Note creation request received for user: {}", uid);
         try {
             createService.createNote(uid, title, content);
-            logger.info("Solicitud de creacion de nota exitosa para usuario: {}", uid);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
+            logger.info("Note creation successful for user: {}", uid);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Note created successfully");
         }catch (ResponseStatusException e) {
-            logger.warn("Error de validación en el registro: {}", e.getMessage());
+            logger.warn("Validation error in note creation: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }

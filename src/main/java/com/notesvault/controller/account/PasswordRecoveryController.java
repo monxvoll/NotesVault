@@ -32,7 +32,7 @@ public class PasswordRecoveryController {
         try {
 
             passwordRecoveryService.generateRecoveryToken(requestDTO.getEmail());
-            return ResponseEntity.ok().body("Correo de recuperacion enviado");
+            return ResponseEntity.ok().body("Recovery email sent");
 
         } catch (UserNotFoundException e) {
 
@@ -40,7 +40,7 @@ public class PasswordRecoveryController {
                     .body(e.getMessage());
         } catch (Exception e) {
 
-            log.error("Error al procesar la solicitud de recuparecion", e);
+            log.error("Error processing recovery request", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
@@ -52,22 +52,22 @@ public class PasswordRecoveryController {
             boolean isValid = passwordRecoveryService.verifyRecoveryToken(requestDTO.getToken(), requestDTO.getEmail());
             
             if (isValid) {
-                return ResponseEntity.ok().body("Token válido");
+                return ResponseEntity.ok().body("Valid token");
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
             }
             
         } catch (Exception e) {
-            log.error("Error al verificar token", e);
+            log.error("Error verifying token", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al verificar el token");
+                    .body("Error verifying token");
         }
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequestDTO requestDTO) {
         try {
-            log.info("Solicitud de cambio de contraseña para usuario: {}", requestDTO.getEmail());
+            log.info("Password change request for user: {}", requestDTO.getEmail());
             
             boolean success = passwordRecoveryService.changePasswordWithToken(
                 requestDTO.getToken(), 
@@ -76,17 +76,17 @@ public class PasswordRecoveryController {
             );
             
             if (success) {
-                log.info("Contraseña cambiada exitosamente para usuario: {}", requestDTO.getEmail());
-                return ResponseEntity.ok().body("Contraseña cambiada exitosamente");
+                log.info("Password successfully changed for user: {}", requestDTO.getEmail());
+                return ResponseEntity.ok().body("Password successfully changed");
             } else {
-                log.warn("No se pudo cambiar la contraseña para usuario: {}", requestDTO.getEmail());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo cambiar la contraseña. Verifica el token.");
+                log.warn("Could not change password for user: {}", requestDTO.getEmail());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not change password. Verify the token.");
             }
             
         } catch (Exception e) {
-            log.error("Error al cambiar contraseña para usuario {}: {}", requestDTO.getEmail(), e.getMessage());
+            log.error("Error changing password for user {}: {}", requestDTO.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al cambiar la contraseña");
+                    .body("Error changing password");
         }
     }
 
@@ -95,31 +95,31 @@ public class PasswordRecoveryController {
             @RequestParam("token") String token,
             @RequestParam("email") String email) {
         try {
-            log.info("Verificando token de recuperación para usuario: {}", email);
+            log.info("Verifying recovery token for user: {}", email);
             
             boolean isValid = passwordRecoveryService.verifyRecoveryToken(token, email);
             
             if (isValid) {
-                // Token válido - responder con JSON
+                // Valid token - respond with JSON
                 return ResponseEntity.ok().body(Map.of(
                     "valid", true,
-                    "message", "Token válido",
+                    "message", "Valid token",
                     "token", token,
                     "email", email
                 ));
             } else {
-                // Token inválido - responder con error
+                // Invalid token - respond with error
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                     "valid", false,
-                    "message", "Token inválido o expirado"
+                    "message", "Invalid or expired token"
                 ));
             }
             
         } catch (Exception e) {
-            log.error("Error al procesar link de recuperación", e);
+            log.error("Error processing recovery link", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                 "valid", false,
-                "message", "Error del servidor"
+                "message", "Server error"
             ));
         }
     }

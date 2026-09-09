@@ -27,17 +27,17 @@ public class RegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody RegisterRequestDTO request) {
-        logger.info("Solicitud de registro recibida para usuario: {} ", request.getUserName());
+        logger.info("Registration request received for user: {} ", request.getUserName());
         try {
             registerService.registerUser(request);
-            logger.info("Registro exitoso para usuario: {}", request.getUserName());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Se ha enviado un correo de confirmación.");
+            logger.info("Registration successful for user: {}", request.getUserName());
+            return ResponseEntity.status(HttpStatus.CREATED).body("A confirmation email has been sent.");
         } catch (ResponseStatusException e) {
-            logger.error("Error en el registro para usuario {}: {} - {}", request.getUserName(), e.getStatusCode(), e.getReason());
+            logger.error("Registration error for user {}: {} - {}", request.getUserName(), e.getStatusCode(), e.getReason());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
-            logger.error("Error inesperado en el registro para usuario {}: {}", request.getUserName(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
+            logger.error("Unexpected error in registration for user {}: {}", request.getUserName(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }
     }
 
@@ -46,50 +46,50 @@ public class RegisterController {
         @RequestParam("token") String token,
         @RequestParam("uid") String uid
     ){
-        logger.info("Solicitud de confirmación de cuenta para usuario: {}", uid);
+        logger.info("Account confirmation request for user: {}", uid);
         try{
             boolean isConfirmed = confirmationEmailService.confirmAccount(token, uid);
             if(isConfirmed){
-                logger.info("Cuenta confirmada exitosamente para usuario: {}", uid);
-                return ResponseEntity.ok("Cuenta confirmada exitosamente");
+                logger.info("Account successfully confirmed for user: {}", uid);
+                return ResponseEntity.ok("Account successfully confirmed");
             }else{
-                logger.warn("Error al confirmar la cuenta para usuario: {} - Token inválido o ya consumido", uid);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al confirmar la cuenta. El enlace puede ser inválido o ya haber sido utilizado.");
+                logger.warn("Error confirming account for user: {} - Invalid or already consumed token", uid);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error confirming account. The link may be invalid or already used.");
             }
         }catch(Exception e){
-            logger.error("Error al confirmar la cuenta para usuario {}: {}", uid, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al confirmar la cuenta");
+            logger.error("Error confirming account for user {}: {}", uid, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error confirming account");
         }
     }
     
     @PostMapping("/resend-confirmation")
     public ResponseEntity<?> resendConfirmationEmail(@RequestParam("uid") String uid, @RequestParam("email") String email) {
-        logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}", uid);
+        logger.info("Resend confirmation email request for user: {}", uid);
         try {
 
-            // Verificar si el usuario ya está confirmado
+            // Verify if the user is already confirmed
             if (confirmationEmailService.isUserConfirmed(uid)) {
-                logger.warn("Intento de reenvío para usuario ya confirmado: {}", uid);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya está confirmado");
+                logger.warn("Resend attempt for already confirmed user: {}", uid);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user is already confirmed");
             }
             
-            // Generar nuevo token de confirmación
+            // Generate new confirmation token
             TokenService.GeneratedTokenInfo tokenInfo = tokenService.generateSecureToken(uid, "confirmation");
-            logger.info("Nuevo token de confirmación generado para usuario: {}", uid);
+            logger.info("New confirmation token generated for user: {}", uid);
             
-            // Enviar correo de confirmación de forma asíncrona
+            // Send confirmation email asynchronously
             confirmationEmailService.sendConfirmationEmailAsync(uid , email, tokenInfo.getRawToken(), null)
                 .exceptionally(throwable -> {
-                    logger.error("Error al reenviar correo de confirmación a {}: {}", uid, throwable.getMessage());
+                    logger.error("Error resending confirmation email to {}: {}", uid, throwable.getMessage());
                     return null;
                 });
             
-            logger.info("Correo de confirmación reenviado exitosamente para usuario: {}", uid);
-            return ResponseEntity.ok("Correo de confirmación reenviado exitosamente");
+            logger.info("Confirmation email successfully resent for user: {}", uid);
+            return ResponseEntity.ok("Confirmation email successfully resent");
             
         } catch (Exception e) {
-            logger.error("Error al reenviar correo de confirmación para usuario {}: {}", uid, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al reenviar el correo de confirmación");
+            logger.error("Error resending confirmation email for user {}: {}", uid, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resending the confirmation email");
         }
     }
 }

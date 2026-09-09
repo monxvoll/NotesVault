@@ -28,13 +28,13 @@ public class DeleteAccountController {
 
     @DeleteMapping("/deleteAccount")
     public ResponseEntity<String> deleteAccount(@RequestParam String uid) {
-        logger.info("Solicitud de eliminación de cuenta recibida para usuario: {}", uid);
+        logger.info("Account deletion request received for user: {}", uid);
         try {
             deleteService.initiateAccountDeletion(uid);
-            logger.info("Correo de eliminación enviado correctamente a: {}", uid);
-            return ResponseEntity.ok("Correo de confimación enviado exitosamente");
+            logger.info("Deletion email sent successfully to: {}", uid);
+            return ResponseEntity.ok("Confirmation email sent successfully");
         }catch (ResponseStatusException e) {
-            logger.warn("Error al enviar el correo de confirmación: {}", e.getMessage());
+            logger.warn("Error sending confirmation email: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
@@ -42,41 +42,41 @@ public class DeleteAccountController {
     @GetMapping("/delete-confirmation")
     public ResponseEntity<?> deleteConfirmation(@RequestParam("token") String token,
                                                 @RequestParam("uid") String uid){
-        logger.info("Solicitud de confirmación de eliminacion de cuenta para usuario: {}",uid);
+        logger.info("Account deletion confirmation request for user: {}",uid);
         try{
             boolean isDelete = deleteService.confirmAccountDeletion(token, uid);
             if(isDelete){
-                logger.info("Cuenta eliminada exitosamente para usuario: {}",uid);
-                return  ResponseEntity.ok("Cuenta eliminada exitosamente");
+                logger.info("Account successfully deleted for user: {}",uid);
+                return  ResponseEntity.ok("Account successfully deleted");
             }else {
-                logger.warn("Error al intentar eliminar la cuenta para usuario: {} - Token inválido o ya consumido",uid);
-                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al intentar eliminar la cuenta. El enlace puede ser invalido");
+                logger.warn("Error attempting to delete account for user: {} - Invalid or already consumed token",uid);
+                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error attempting to delete account. The link may be invalid");
             }
         }catch (Exception e){
-            logger.error("Error al eliminar la cuenta para usuario {}: {}",uid,e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor al intentar la eliminacion de cuenta");
+            logger.error("Error deleting account for user {}: {}",uid,e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error attempting to delete account");
         }
     }
 
     @PostMapping("/resend-delete-confirmation")
     public ResponseEntity<?> resendConfirmationEmail(@RequestParam("uid") String uid){
-        logger.info("Solicitud de reenvío de correo de confirmación para usuario: {}",uid);
+        logger.info("Resend confirmation email request for user: {}",uid);
         try{
 
             if(deleteService.isAccountDeleted(uid)){
-                logger.warn("No se puede reenviar token: la cuenta {} ya está eliminada o inactiva", uid);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La cuenta no existe o esta inactiva");
+                logger.warn("Cannot resend token: account {} is already deleted or inactive", uid);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The account does not exist or is inactive");
             }
 
             deleteService.initiateAccountDeletion(uid);
 
 
-            logger.info("Correo de eliminación reenviado exitosamente para usuario: {}", uid);
-            return ResponseEntity.ok("Correo de eliminación reenviado exitosamente");
+            logger.info("Deletion email successfully resent for user: {}", uid);
+            return ResponseEntity.ok("Deletion email successfully resent");
 
         } catch (Exception e) {
-            logger.error("Error al reenviar correo de eliminación para usuario {}: {}", uid, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al reenviar el correo de eliminación");
+            logger.error("Error resending deletion email for user {}: {}", uid, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resending deletion email");
         }
     }
 }

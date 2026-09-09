@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/note")
-//Por ahora haremos consultas  de lectura generales, usando el email
+// For now we will do general read queries, using the email
 public class ReadController {
     private static final Logger logger = LoggerFactory.getLogger(ReadController.class);
     private final ReadService readService;
@@ -30,10 +30,10 @@ public class ReadController {
 
         try {
             List<Note> notes = readService.readNote(uid);
-            logger.info("Solicitud de lectura para el usuario: {}",uid);
+            logger.info("Read request for user: {}",uid);
             return ResponseEntity.ok(notes);
         }catch (ResponseStatusException e){
-            logger.error("Error en la consulta de las nota: {}", e.getMessage());
+            logger.error("Error querying notes: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }

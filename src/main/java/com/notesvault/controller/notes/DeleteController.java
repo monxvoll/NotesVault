@@ -22,13 +22,13 @@ public class DeleteController {
     public ResponseEntity<String> deleteNote(@RequestParam  String noteId, Principal principal) {
         String uid = principal.getName();
 
-        logger.info("Solicitud de eliminacion para nota con ID: {}",noteId);
+        logger.info("Deletion request for note with ID: {}",noteId);
         try{
             deleteService.deleteNote(uid,noteId);
-            logger.info("Solicitud de eliminacion exitosa para usuario: {}", uid);
-            return ResponseEntity.ok("Nota eliminada exitosamente");
+            logger.info("Deletion successful for user: {}", uid);
+            return ResponseEntity.ok("Note successfully deleted");
         } catch (ResponseStatusException e) {
-            logger.error("Error en la eliminacion de la nota: {}", e.getMessage());
+            logger.error("Error deleting note: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }

@@ -24,11 +24,11 @@ public class UpdateController {
         String uid = principal.getName();
 
         try{
-            logger.info("Solicitud de actualizacion en la nota con id {} para el usuario {}", noteId, uid);
+            logger.info("Update request for note with id {} for user {}", noteId, uid);
             updateService.updateNote(noteId,noteDTO,uid);
-            return ResponseEntity.ok("Nota Actualizada Correctamente");
+            return ResponseEntity.ok("Note successfully updated");
         }catch (ResponseStatusException e){
-            logger.error("Error en la actualizacion de la nota: {}", e.getMessage());
+            logger.error("Error updating note: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
