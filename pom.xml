@@ -16,7 +16,7 @@
     </properties>
 
     <dependencies>
-        <!-- Seguridad -->
+        <!-- Security -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
@@ -98,7 +98,7 @@
 
     <build>
         <plugins>
-            <!-- Plugin para compilar con Java 16 -->
+            <!-- Plugin to compile with Java 21 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

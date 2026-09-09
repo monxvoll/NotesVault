@@ -3,7 +3,7 @@ src/main/resources/firebase-config.json
 src/main/resources/application.properties
 
 
-#  Archivos del sistema
+# System files
 .DS_Store
 
 # Maven
