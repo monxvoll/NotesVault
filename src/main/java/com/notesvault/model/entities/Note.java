@@ -9,8 +9,8 @@ public class Note {
     private String id;
     private boolean isActive;
 
-    /*Constructor vacío para firestore porque, al deserializar un documento (convertirlo en un objeto Java)
-    , crea una instancia vacía de la clase y luego llena sus atributos con los datos del documento.
+    /*Empty constructor for Firestore because, when deserializing a document (converting it into a Java object)
+    , it creates an empty instance of the class and then fills its attributes with the document's data.
      */
     public Note(){
 
