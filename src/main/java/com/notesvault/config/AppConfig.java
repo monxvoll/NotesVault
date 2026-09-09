@@ -8,15 +8,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Configuración general de la aplicación
- * Centraliza beans comunes y configuraciones
+ * General application configuration
+ * Centralizes common beans and configurations
  */
 @Configuration
 public class AppConfig {
 
     /**
-     * Bean para el encoder de contraseñas
-     * @return BCryptPasswordEncoder configurado
+     * Bean for the password encoder
+     * @return configured BCryptPasswordEncoder
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -24,8 +24,8 @@ public class AppConfig {
     }
 
     /**
-     * Bean para configuración de logging personalizada
-     * @return Logger configurado para la aplicación
+     * Bean for custom logging configuration
+     * @return configured Logger for the application
      */
     @Bean
     public org.slf4j.Logger appLogger() {

@@ -77,7 +77,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
         } catch (FirebaseAuthException e) {
             // If the token is false, we don't do anything, the user is still anonymous
-            logger.error("Error verificando token de Firebase: {}", e);
+            logger.error("Error verifying Firebase token: {}", e);
         }
 
 

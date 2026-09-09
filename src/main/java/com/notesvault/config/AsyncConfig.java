@@ -9,8 +9,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 /**
- * Configuración para operaciones asíncronas en la aplicación
- * Centraliza todos los executors y configuraciones de threads
+ * Configuration for asynchronous operations in the application
+ * Centralizes all executors and thread configurations
  */
 @Configuration
 @EnableAsync
@@ -18,15 +18,15 @@ import java.util.concurrent.Executor;
 public class AsyncConfig {
 
     /**
-     * Configuración del pool de threads para el envío asíncrono de emails
-     * @return Executor configurado para tareas de email
+     * Thread pool configuration for asynchronous email sending
+     * @return configured Executor for email tasks
      */
     @Bean(name = "emailTaskExecutor")
     public Executor emailTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2); // Threads mínimos
-        executor.setMaxPoolSize(5);  // Threads máximos
-        executor.setQueueCapacity(100); // Cola de tareas pendientes
+        executor.setCorePoolSize(2); // Minimum threads
+        executor.setMaxPoolSize(5);  // Maximum threads
+        executor.setQueueCapacity(100); // Pending tasks queue
         executor.setThreadNamePrefix("EmailThread-");
         executor.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
@@ -34,15 +34,15 @@ public class AsyncConfig {
     }
 
     /**
-     * Configuración del pool de threads para operaciones generales de Firestore
-     * @return Executor configurado para tareas de base de datos
+     * Thread pool configuration for general Firestore operations
+     * @return configured Executor for database tasks
      */
     @Bean(name = "firestoreTaskExecutor")
     public Executor firestoreTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3); // Threads mínimos
-        executor.setMaxPoolSize(10); // Threads máximos
-        executor.setQueueCapacity(200); // Cola de tareas pendientes
+        executor.setCorePoolSize(3); // Minimum threads
+        executor.setMaxPoolSize(10); // Maximum threads
+        executor.setQueueCapacity(200); // Pending tasks queue
         executor.setThreadNamePrefix("FirestoreThread-");
         executor.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
@@ -50,19 +50,19 @@ public class AsyncConfig {
     }
 
     /**
-     * Configuración del pool de threads para operaciones de limpieza y mantenimiento
-     * @return Executor configurado para tareas de limpieza
+     * Thread pool configuration for cleanup and maintenance operations
+     * @return configured Executor for cleanup tasks
      */
     @Bean(name = "cleanupTaskExecutor")
     public Executor cleanupTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2); // Threads mínimos - 2
-        executor.setMaxPoolSize(5);  // Threads máximos - 5
-        executor.setQueueCapacity(100); // Cola de tareas pendientes - 100
+        executor.setCorePoolSize(2); // Minimum threads - 2
+        executor.setMaxPoolSize(5);  // Maximum threads - 5
+        executor.setQueueCapacity(100); // Pending tasks queue - 100
         executor.setThreadNamePrefix("CleanupThread-");
         executor.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setWaitForTasksToCompleteOnShutdown(true); // Esperar a que las tareas se completen al cerrar
-        executor.setAwaitTerminationSeconds(30); // Esperar hasta 30 segundos
+        executor.setWaitForTasksToCompleteOnShutdown(true); // Wait for tasks to complete on shutdown
+        executor.setAwaitTerminationSeconds(30); // Wait up to 30 seconds
         executor.initialize();
         return executor;
     }
